@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.bg-cream {
+  background-color: #FFF8F0;
+}
+
+.bg-coral {
+  background-color: #FF6B6B;
+}
+
+.text-coral {
+  color: #FF6B6B;
+}
+
+.border-coral {
+  border-color: #FF6B6B;
+}
+
+.border-3 {
+  border-width: 3px;
+}
