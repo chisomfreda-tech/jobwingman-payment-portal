@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // CONFIGURE CLIENT PASSWORDS HERE
 const CLIENT_PASSWORDS = {
@@ -317,6 +317,11 @@ export default function JobWingmanPortal() {
     coverLetters: { selected: false, option: 0 },
     networkWingman: { selected: false }
   });
+
+  // Scroll to top when page or step changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentPage, currentStep, authenticated, nameCollected, orderConfirmed]);
 
   const handleLogin = () => {
     if (CLIENT_PASSWORDS[password.toLowerCase().trim()]) {
@@ -1695,14 +1700,9 @@ export default function JobWingmanPortal() {
               {/* Alternative payment */}
               <div className="text-center mb-6">
                 <p className="text-teal-500 text-sm mb-2">Don't have Zelle?</p>
-                <div className="flex justify-center gap-3">
-                  <a href="https://paypal.me/jobwingman" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white border-2 border-teal-200 rounded-xl text-teal-700 font-medium text-sm hover:border-teal-400 transition">
-                    PayPal
-                  </a>
-                  <a href="https://venmo.com/jobwingman" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white border-2 border-teal-200 rounded-xl text-teal-700 font-medium text-sm hover:border-teal-400 transition">
-                    Venmo
-                  </a>
-                </div>
+                <a href="https://venmo.com/ChisomEgwuatu" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white border-2 border-teal-200 rounded-xl text-teal-700 font-medium text-sm hover:border-teal-400 transition">
+                  Venmo (@ChisomEgwuatu)
+                </a>
               </div>
               
               {/* Order summary */}
