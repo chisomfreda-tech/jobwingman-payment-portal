@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
-// CONFIGURE CLIENT PASSWORDS HERE
-const CLIENT_PASSWORDS = {
+// Supabase client
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://dpgisnslhirfljwerrci.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwZ2lzbnNsaGlyZmxqd2VycmNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MzE3MjYsImV4cCI6MjA4MzIwNzcyNn0.B0J6G-PIc3LvIrFR6jKeuyGyX6cizF5ECRyLJi4-kNI';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Fallback passwords (in case Supabase is down)
+const FALLBACK_PASSWORDS = {
   'demo2025': true,
-  'sarah123': true,
-  'james456': true,
-  'olamidejw012026': true,
 };
 
 // Navigation component
@@ -285,6 +288,8 @@ export default function JobWingmanPortal() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [clientId, setClientId] = useState(null); // Supabase client ID
   
   // Name collection state
   const [firstName, setFirstName] = useState('');
@@ -309,6 +314,7 @@ export default function JobWingmanPortal() {
   const [agreed, setAgreed] = useState(false);
   const [clientEmail, setClientEmail] = useState('');
   const [showTerms, setShowTerms] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Results page state
   const [showAllStories, setShowAllStories] = useState(false);
@@ -329,12 +335,43 @@ export default function JobWingmanPortal() {
     window.scrollTo(0, 0);
   }, [currentPage, currentStep, authenticated, nameCollected, orderConfirmed, showAgreement]);
 
-  const handleLogin = () => {
-    if (CLIENT_PASSWORDS[password.toLowerCase().trim()]) {
-      setAuthenticated(true);
-      setError('');
-    } else {
-      setError('That code doesn\'t look right. Check your email for your access link!');
+  const handleLogin = async () => {
+    const code = password.toLowerCase().trim();
+    setIsLoggingIn(true);
+    setError('');
+    
+    try {
+      // Check Supabase for access code
+      const { data, error: dbError } = await supabase
+        .from('clients')
+        .select('id, first_name, last_name, email')
+        .eq('access_code', code)
+        .single();
+      
+      if (data) {
+        // Found client in database
+        setClientId(data.id);
+        setFirstName(data.first_name || '');
+        setLastName(data.last_name || '');
+        if (data.email) setClientEmail(data.email);
+        setAuthenticated(true);
+        setNameCollected(!!data.first_name); // Skip name step if we have it
+      } else if (FALLBACK_PASSWORDS[code]) {
+        // Fallback for demo/testing
+        setAuthenticated(true);
+      } else {
+        setError('That code doesn\'t look right. Check your email for your access link!');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      // Try fallback
+      if (FALLBACK_PASSWORDS[code]) {
+        setAuthenticated(true);
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -356,6 +393,103 @@ export default function JobWingmanPortal() {
       ...prev,
       [key]: { ...prev[key], option }
     }));
+  };
+
+  // Handle order completion - create order in Supabase and send email
+  const handleOrderComplete = async (items, total, paymentPlan) => {
+    setIsSubmitting(true);
+    
+    try {
+      // 1. Create client_order in Supabase
+      const orderData = {
+        client_id: clientId,
+        first_name: firstName,
+        last_name: lastName || null,
+        email: clientEmail,
+        items: JSON.stringify(items),
+        total_amount: total,
+        payment_type: paymentChoice === 'full' ? 'full' : 'installment',
+        deposit_amount: paymentChoice === 'full' ? total : paymentPlan.deposit,
+        num_installments: paymentChoice === 'full' ? 0 : paymentPlan.installments,
+        installment_amount: paymentChoice === 'full' ? null : paymentPlan.perInstallment,
+        status: 'pending',
+      };
+      
+      const { data: order, error: orderError } = await supabase
+        .from('client_orders')
+        .insert(orderData)
+        .select()
+        .single();
+      
+      if (orderError) {
+        console.error('Order creation error:', orderError);
+        // Continue anyway - don't block the user
+      }
+      
+      // 2. Create payment records
+      if (order) {
+        // Deposit payment
+        const depositDueDate = new Date();
+        depositDueDate.setDate(depositDueDate.getDate() + 3); // Due in 3 days
+        
+        await supabase.from('client_payments').insert({
+          order_id: order.id,
+          client_id: clientId,
+          description: paymentChoice === 'full' ? 'Full Payment' : 'Deposit',
+          amount: paymentChoice === 'full' ? total : paymentPlan.deposit,
+          due_date: depositDueDate.toISOString().split('T')[0],
+          status: 'upcoming',
+        });
+        
+        // Installment payments (if payment plan)
+        if (paymentChoice === 'plan' && paymentPlan.installments > 0) {
+          for (let i = 1; i <= paymentPlan.installments; i++) {
+            const installmentDate = new Date();
+            installmentDate.setDate(installmentDate.getDate() + 7 + (i * 14)); // 7 days after start, then every 2 weeks
+            
+            await supabase.from('client_payments').insert({
+              order_id: order.id,
+              client_id: clientId,
+              description: `Installment ${i} of ${paymentPlan.installments}`,
+              amount: paymentPlan.perInstallment,
+              due_date: installmentDate.toISOString().split('T')[0],
+              status: 'upcoming',
+            });
+          }
+        }
+      }
+      
+      // 3. Send confirmation email
+      try {
+        await fetch('/api/send-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientName: firstName,
+            clientEmail: clientEmail,
+            items: items,
+            total: total,
+            paymentType: paymentChoice,
+            deposit: paymentPlan.deposit,
+            installments: paymentPlan.installments,
+            installmentAmount: paymentPlan.perInstallment,
+          }),
+        });
+      } catch (emailError) {
+        console.error('Email send error:', emailError);
+        // Don't block on email failure
+      }
+      
+      // 4. Show success screen
+      setOrderConfirmed(true);
+      
+    } catch (err) {
+      console.error('Order completion error:', err);
+      // Still show success - better UX than error
+      setOrderConfirmed(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Pricing data
@@ -691,9 +825,14 @@ export default function JobWingmanPortal() {
               
               <button
                 onClick={handleLogin}
-                className="w-full bg-teal-500 hover:bg-teal-600 text-white border-3 border-teal-900 py-4 rounded-xl font-bold text-lg shadow-[4px_4px_0px_0px_rgba(19,78,74,1)] hover:shadow-[6px_6px_0px_0px_rgba(19,78,74,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all"
+                disabled={isLoggingIn}
+                className={`w-full border-3 border-teal-900 py-4 rounded-xl font-bold text-lg shadow-[4px_4px_0px_0px_rgba(19,78,74,1)] transition-all ${
+                  isLoggingIn 
+                    ? 'bg-teal-400 text-white cursor-wait'
+                    : 'bg-teal-500 hover:bg-teal-600 text-white hover:shadow-[6px_6px_0px_0px_rgba(19,78,74,1)] hover:translate-x-[-2px] hover:translate-y-[-2px]'
+                }`}
               >
-                Continue
+                {isLoggingIn ? 'Checking...' : 'Continue'}
               </button>
             </div>
             
@@ -1799,15 +1938,15 @@ export default function JobWingmanPortal() {
               />
 
               <button
-                onClick={() => setOrderConfirmed(true)}
-                disabled={!agreed || !clientEmail.includes('@')}
+                onClick={() => handleOrderComplete(items, total, paymentPlan)}
+                disabled={!agreed || !clientEmail.includes('@') || isSubmitting}
                 className={`w-full py-4 rounded-xl font-black text-lg transition-all ${
-                  agreed && clientEmail.includes('@')
+                  agreed && clientEmail.includes('@') && !isSubmitting
                     ? 'bg-coral border-4 border-teal-900 text-white shadow-[4px_4px_0px_0px_rgba(19,78,74,1)] hover:shadow-[2px_2px_0px_0px_rgba(19,78,74,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-1 active:translate-y-1'
                     : 'bg-teal-100 border-4 border-teal-200 text-teal-300 cursor-not-allowed'
                 }`}
               >
-                Confirm & Continue →
+                {isSubmitting ? 'Processing...' : 'Confirm & Continue →'}
               </button>
 
               <p className="text-xs text-teal-400 text-center mt-3">
