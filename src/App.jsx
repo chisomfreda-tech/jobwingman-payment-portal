@@ -290,6 +290,7 @@ export default function JobWingmanPortal() {
   const [error, setError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [clientId, setClientId] = useState(null); // Supabase client ID
+  const [accessCode, setAccessCode] = useState(''); // Client's access code
   
   // Name collection state
   const [firstName, setFirstName] = useState('');
@@ -315,6 +316,7 @@ export default function JobWingmanPortal() {
   const [clientEmail, setClientEmail] = useState('');
   const [showTerms, setShowTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   
   // Results page state
   const [showAllStories, setShowAllStories] = useState(false);
@@ -351,6 +353,7 @@ export default function JobWingmanPortal() {
       if (data) {
         // Found client in database
         setClientId(data.id);
+        setAccessCode(code); // Save access code for email
         setFirstName(data.first_name || '');
         setLastName(data.last_name || '');
         if (data.email) setClientEmail(data.email);
@@ -358,6 +361,7 @@ export default function JobWingmanPortal() {
         setNameCollected(!!data.first_name); // Skip name step if we have it
       } else if (FALLBACK_PASSWORDS[code]) {
         // Fallback for demo/testing
+        setAccessCode(code);
         setAuthenticated(true);
       } else {
         setError('That code doesn\'t look right. Check your email for your access link!');
@@ -398,95 +402,99 @@ export default function JobWingmanPortal() {
   // Handle order completion - create order in Supabase and send email
   const handleOrderComplete = async (items, total, paymentPlan) => {
     setIsSubmitting(true);
+    setSubmitError('');
     
     try {
-      // 1. Create client_order in Supabase
-      const orderData = {
-        client_id: clientId,
-        first_name: firstName,
-        last_name: lastName || null,
-        email: clientEmail,
-        items: JSON.stringify(items),
-        total_amount: total,
-        payment_type: paymentChoice === 'full' ? 'full' : 'installment',
-        deposit_amount: paymentChoice === 'full' ? total : paymentPlan.deposit,
-        num_installments: paymentChoice === 'full' ? 0 : paymentPlan.installments,
-        installment_amount: paymentChoice === 'full' ? null : paymentPlan.perInstallment,
-        status: 'pending',
-      };
-      
-      const { data: order, error: orderError } = await supabase
-        .from('client_orders')
-        .insert(orderData)
-        .select()
-        .single();
-      
-      if (orderError) {
-        console.error('Order creation error:', orderError);
-        // Continue anyway - don't block the user
-      }
-      
-      // 2. Create payment records
-      if (order) {
-        // Deposit payment
-        const depositDueDate = new Date();
-        depositDueDate.setDate(depositDueDate.getDate() + 3); // Due in 3 days
-        
-        await supabase.from('client_payments').insert({
-          order_id: order.id,
+      // Only save to Supabase if we have a real client ID (not demo mode)
+      if (clientId) {
+        // 1. Create client_order in Supabase
+        const orderData = {
           client_id: clientId,
-          description: paymentChoice === 'full' ? 'Full Payment' : 'Deposit',
-          amount: paymentChoice === 'full' ? total : paymentPlan.deposit,
-          due_date: depositDueDate.toISOString().split('T')[0],
-          status: 'upcoming',
-        });
+          first_name: firstName,
+          last_name: lastName || null,
+          email: clientEmail,
+          items: JSON.stringify(items),
+          total_amount: total,
+          payment_type: paymentChoice === 'full' ? 'full' : 'installment',
+          deposit_amount: paymentChoice === 'full' ? total : paymentPlan.deposit,
+          num_installments: paymentChoice === 'full' ? 0 : paymentPlan.installments,
+          installment_amount: paymentChoice === 'full' ? null : paymentPlan.perInstallment,
+          status: 'pending',
+        };
         
-        // Installment payments (if payment plan)
-        if (paymentChoice === 'plan' && paymentPlan.installments > 0) {
-          for (let i = 1; i <= paymentPlan.installments; i++) {
-            const installmentDate = new Date();
-            installmentDate.setDate(installmentDate.getDate() + 7 + (i * 14)); // 7 days after start, then every 2 weeks
-            
-            await supabase.from('client_payments').insert({
-              order_id: order.id,
-              client_id: clientId,
-              description: `Installment ${i} of ${paymentPlan.installments}`,
-              amount: paymentPlan.perInstallment,
-              due_date: installmentDate.toISOString().split('T')[0],
-              status: 'upcoming',
-            });
+        const { data: order, error: orderError } = await supabase
+          .from('client_orders')
+          .insert(orderData)
+          .select()
+          .single();
+        
+        if (orderError) {
+          console.error('Order creation error:', orderError);
+          // Continue anyway - don't block the user
+        }
+        
+        // 2. Create payment records
+        if (order) {
+          // Deposit payment
+          const depositDueDate = new Date();
+          depositDueDate.setDate(depositDueDate.getDate() + 3); // Due in 3 days
+          
+          await supabase.from('client_payments').insert({
+            order_id: order.id,
+            client_id: clientId,
+            description: paymentChoice === 'full' ? 'Full Payment' : 'Deposit',
+            amount: paymentChoice === 'full' ? total : paymentPlan.deposit,
+            due_date: depositDueDate.toISOString().split('T')[0],
+            status: 'upcoming',
+          });
+          
+          // Installment payments (if payment plan)
+          if (paymentChoice === 'plan' && paymentPlan.installments > 0) {
+            for (let i = 1; i <= paymentPlan.installments; i++) {
+              const installmentDate = new Date();
+              installmentDate.setDate(installmentDate.getDate() + 7 + (i * 14)); // 7 days after start, then every 2 weeks
+              
+              await supabase.from('client_payments').insert({
+                order_id: order.id,
+                client_id: clientId,
+                description: `Installment ${i} of ${paymentPlan.installments}`,
+                amount: paymentPlan.perInstallment,
+                due_date: installmentDate.toISOString().split('T')[0],
+                status: 'upcoming',
+              });
+            }
           }
+        }
+        
+        // 3. Send confirmation email
+        try {
+          await fetch('/api/send-confirmation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clientName: firstName,
+              clientEmail: clientEmail,
+              accessCode: accessCode,
+              items: items,
+              total: total,
+              paymentType: paymentChoice,
+              deposit: paymentPlan.deposit,
+              installments: paymentPlan.installments,
+              installmentAmount: paymentPlan.perInstallment,
+            }),
+          });
+        } catch (emailError) {
+          console.error('Email send error:', emailError);
+          // Don't block on email failure
         }
       }
       
-      // 3. Send confirmation email
-      try {
-        await fetch('/api/send-confirmation', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            clientName: firstName,
-            clientEmail: clientEmail,
-            items: items,
-            total: total,
-            paymentType: paymentChoice,
-            deposit: paymentPlan.deposit,
-            installments: paymentPlan.installments,
-            installmentAmount: paymentPlan.perInstallment,
-          }),
-        });
-      } catch (emailError) {
-        console.error('Email send error:', emailError);
-        // Don't block on email failure
-      }
-      
-      // 4. Show success screen
+      // 4. Show success screen (always - even for demo mode)
       setOrderConfirmed(true);
       
     } catch (err) {
       console.error('Order completion error:', err);
-      // Still show success - better UX than error
-      setOrderConfirmed(true);
+      setSubmitError('Something went wrong. Please try again or contact us directly.');
     } finally {
       setIsSubmitting(false);
     }
@@ -1937,6 +1945,12 @@ export default function JobWingmanPortal() {
                 className="w-full px-4 py-3 border-3 border-teal-200 rounded-xl text-teal-900 placeholder-teal-300 focus:outline-none focus:border-teal-500 transition-colors mb-4 bg-white"
               />
 
+              {submitError && (
+                <div className="bg-red-100 border-2 border-red-400 rounded-xl p-3 mb-4 text-red-700 text-sm">
+                  {submitError}
+                </div>
+              )}
+
               <button
                 onClick={() => handleOrderComplete(items, total, paymentPlan)}
                 disabled={!agreed || !clientEmail.includes('@') || isSubmitting}
@@ -2025,7 +2039,7 @@ export default function JobWingmanPortal() {
                 <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4">
                   <p className="text-sm font-bold text-teal-900 mb-1">📝 Important: Include this memo</p>
                   <p className="font-mono bg-white px-3 py-2 rounded-lg text-teal-900 border border-yellow-400">
-                    JW Deposit
+                    {accessCode ? accessCode.toUpperCase() : 'JW Deposit'}
                   </p>
                 </div>
               </div>
