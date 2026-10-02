@@ -1881,7 +1881,7 @@ export default function JobWingmanPortal() {
                     
                     <p><strong>3. What You Do.</strong> You agree to provide accurate information about your background, respond to our communications within 48 hours, and notify us of any interviews or offers received.</p>
                     
-                    <p><strong>4. Payment.</strong> A deposit is required before services begin. For payment plans, remaining installments are due on Mondays, beginning one week after applications go live. We accept payment by LemFi transfer to our Nigerian bank account (Job Wingman LTD, Zenith Bank), Zelle, and Venmo.</p>
+                    <p><strong>4. Payment.</strong> A deposit is required before services begin. For payment plans, remaining installments are due on Mondays, beginning one week after applications go live. We accept payment by transfer to our bank account (Job Wingman LTD, Zenith Bank), sent through LemFi.</p>
                     
                     <p><strong>5. Refunds.</strong> Resume services are non-refundable once work begins. Application services may be paused but are non-refundable. If you land a job, unused months can be credited toward future services.</p>
                     
@@ -2067,42 +2067,6 @@ export default function JobWingmanPortal() {
                 </div>
               </div>
 
-              <p className="text-center text-teal-600 text-sm font-bold mb-3">Other ways to pay</p>
-
-              {/* Zelle instructions */}
-              <div className="bg-white border-3 border-teal-200 rounded-2xl p-5 mb-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center">
-                    <span className="text-white font-black text-lg">Z</span>
-                  </div>
-                  <div>
-                    <h3 className="font-black text-teal-900">Pay with Zelle</h3>
-                    <p className="text-teal-500 text-sm">No fees</p>
-                  </div>
-                </div>
-                
-                <div className="bg-teal-50 rounded-xl p-4 mb-4">
-                  <p className="text-sm text-teal-600 mb-2">Send to:</p>
-                  <p className="text-xl font-black text-teal-900 mb-1">(628) 228-1964</p>
-                  <p className="text-teal-500 text-sm">Will show as "Chisom Egwuatu"</p>
-                </div>
-                
-                <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4">
-                  <p className="text-sm font-bold text-teal-900 mb-1">📝 Important: Include this memo</p>
-                  <p className="font-mono bg-white px-3 py-2 rounded-lg text-teal-900 border border-yellow-400">
-                    {accessCode ? accessCode.toUpperCase() : 'JW Deposit'}
-                  </p>
-                </div>
-              </div>
-              
-              {/* Alternative payment */}
-              <div className="text-center mb-6">
-                <p className="text-teal-500 text-sm mb-2">Don't have Zelle?</p>
-                <a href="https://venmo.com/ChisomEgwuatu" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white border-2 border-teal-200 rounded-xl text-teal-700 font-medium text-sm hover:border-teal-400 transition">
-                  Venmo (@ChisomEgwuatu)
-                </a>
-              </div>
-              
               {/* Order summary */}
               <div className="border-t-2 border-teal-100 pt-6">
                 <h4 className="font-bold text-teal-900 mb-3">Your Package</h4>
