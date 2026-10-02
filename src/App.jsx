@@ -583,7 +583,7 @@ export default function JobWingmanPortal() {
       price: 199,
       description: '"My resume is solid and I\'m already getting some interviews. I just need more volume."',
       includes: [
-        '1 month of applications (400+ minimum)',
+        '400+ applications in 30 days',
         '1 job title'
       ],
       best: 'Resume ready, just need the legwork handled'
@@ -595,7 +595,7 @@ export default function JobWingmanPortal() {
       description: '"I\'ve been applying for months with no results. Something isn\'t working."',
       includes: [
         'Resume tune-up (ATS check, AI cleanup, stronger bullets)',
-        '1 month of applications (400+ minimum)',
+        '400+ applications in 30 days',
         '1 job title'
       ],
       best: 'Stuck in a rut, need a reset'
@@ -608,7 +608,7 @@ export default function JobWingmanPortal() {
       description: '"I just got laid off. I need to rebuild and move fast."',
       includes: [
         'Full resume rewrite (we interview you, rebuild from scratch)',
-        '1 month of applications (400+ minimum)',
+        '400+ applications in 30 days',
         'Post-apply recruiter outreach',
         '1 job title'
       ],
@@ -623,7 +623,7 @@ export default function JobWingmanPortal() {
       description: '"I need sponsorship and have limited time. Every application has to count."',
       includes: [
         'Full resume rewrite (we interview you, rebuild from scratch)',
-        '2 months of applications (400+ minimum)',
+        'Two 30-day campaigns (400+ applications each)',
         '20 tailored applications',
         '20 cover letters',
         'Post-apply recruiter outreach',
@@ -1357,14 +1357,14 @@ export default function JobWingmanPortal() {
           <p className="text-teal-600 mb-6">This is the core of what we do. We apply to jobs on your behalf while you focus on interviews and prep.</p>
           
           <Wingman 
-            message="We apply to every job that matches your criteria — 400 minimum guaranteed. Most people start seeing interview requests within 2-4 weeks. I usually suggest at least 2 months since job searches take time, but it's up to you."
+            message="We apply to every job that matches your criteria — at least 400 in every 30 days. Most people start seeing interview requests within 2-4 weeks. I usually suggest at least 2 months since job searches take time, but it's up to you."
           />
           
           <div className="bg-white border-3 border-teal-200 rounded-2xl p-6 mb-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <h3 className="font-black text-teal-900 text-xl">Application Service</h3>
-                <p className="text-teal-500">400+ applications minimum</p>
+                <p className="text-teal-500">400+ applications in 30 days</p>
               </div>
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-teal-900">$199</span>
@@ -1389,7 +1389,7 @@ export default function JobWingmanPortal() {
               <h4 className="font-bold text-teal-800 mb-3">What's included:</h4>
               <div className="grid md:grid-cols-2 gap-2">
                 {[
-                  '400+ applications minimum',
+                  '400+ applications in every 30 days',
                   'We apply daily on your behalf',
                   'Every job matching your criteria',
                   'Spreadsheet to track everything',
@@ -1753,7 +1753,7 @@ export default function JobWingmanPortal() {
                   </li>
                   <li className="flex gap-2">
                     <span className="font-bold text-teal-500">3.</span>
-                    Once payment is in, we get started within 48 hours
+                    Once payment is in, we'll schedule your kickoff and confirm your Monday start date
                   </li>
                 </ol>
               </div>
@@ -1877,15 +1877,15 @@ export default function JobWingmanPortal() {
                   <div className="mt-4 pt-4 border-t border-teal-200 text-sm text-teal-700 space-y-3 max-h-64 overflow-y-auto">
                     <p><strong>1. Services.</strong> Job Wingman ("JW") agrees to provide the job search services selected above for the duration specified. Services include resume writing, job applications, and any add-ons selected.</p>
                     
-                    <p><strong>2. What We Do.</strong> We submit applications on your behalf to positions matching your criteria. We target a minimum of 400 applications per month of service. We cannot guarantee interviews or job offers, as hiring decisions are made by employers.</p>
+                    <p><strong>2. What We Do.</strong> We submit applications on your behalf to positions matching your criteria. We target a minimum of 400 applications in each 30-day period of service. We cannot guarantee interviews or job offers, as hiring decisions are made by employers.</p>
                     
                     <p><strong>3. What You Do.</strong> You agree to provide accurate information about your background, respond to our communications within 48 hours, and notify us of any interviews or offers received.</p>
                     
-                    <p><strong>4. Payment.</strong> A deposit is required before services begin. For payment plans, remaining installments begin one week after applications go live. We accept Zelle and Venmo.</p>
+                    <p><strong>4. Payment.</strong> A deposit is required before services begin. For payment plans, remaining installments are due on Mondays, beginning one week after applications go live. We accept payment by LemFi transfer to our Nigerian bank account (Job Wingman LTD, Zenith Bank), Zelle, and Venmo.</p>
                     
                     <p><strong>5. Refunds.</strong> Resume services are non-refundable once work begins. Application services may be paused but are non-refundable. If you land a job, unused months can be credited toward future services.</p>
                     
-                    <p><strong>6. Timeline.</strong> Resume drafts delivered within 3 weeks. Applications begin within 48 hours of receiving your approved resume and intake form.</p>
+                    <p><strong>6. Timeline.</strong> Resume drafts delivered within 3 weeks. Applications begin on a Monday. To start on a given Monday, your approved resume, completed intake form, and deposit must all be received by the Thursday before at 11:59 PM Eastern Time; otherwise applications begin the following Monday.</p>
                     
                     <p><strong>7. Communication.</strong> We provide weekly updates on application activity. You can reach us via email or text for questions.</p>
                     
@@ -2013,6 +2013,62 @@ export default function JobWingmanPortal() {
                 )}
               </div>
               
+              {/* LemFi instructions: the main way to pay (added Oct 2026).
+                  Money goes to Job Wingman LTD's Zenith Bank naira account; LemFi
+                  converts the client's dollars. LemFi only supports UBA and Access
+                  USD (domiciliary) accounts, so a Zenith account receives naira. */}
+              <div className="bg-white border-3 border-teal-500 rounded-2xl p-5 mb-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center">
+                    <span className="text-white font-black text-lg">L</span>
+                  </div>
+                  <div>
+                    <h3 className="font-black text-teal-900">Pay with LemFi</h3>
+                    <p className="text-teal-500 text-sm">No transfer fees · send from your US bank or debit card</p>
+                  </div>
+                </div>
+
+                <ol className="space-y-3 text-sm text-teal-800 mb-4">
+                  <li className="flex gap-3"><span className="font-black text-teal-500">1.</span><span>Download <a href="https://lemfi.com/en-us" target="_blank" rel="noopener noreferrer" className="font-bold underline">LemFi</a> from the App Store or Google Play and create an account.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">2.</span><span>Verify your identity in the app (a photo ID and a selfie). This usually takes a few minutes.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">3.</span><span>Tap <strong>Send money</strong>, choose <strong>Nigeria</strong>, then <strong>Bank account</strong>, and add the recipient below.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">4.</span><span>Enter <strong>${amountDue}</strong> as the amount you send in US dollars. LemFi shows what arrives in naira; that's expected.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">5.</span><span>Pay with your US bank account or debit card and confirm.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">6.</span><span>Email the confirmation screenshot to <a href="mailto:wingman@thejobwingman.com" className="font-bold underline">wingman@thejobwingman.com</a> with your code below, so we can match it to you.</span></li>
+                </ol>
+
+                <div className="bg-teal-50 rounded-xl p-4 mb-4 space-y-2">
+                  <p className="text-sm text-teal-600">Recipient:</p>
+                  {[
+                    ['Bank', 'Zenith Bank'],
+                    ['Account name', 'Job Wingman LTD'],
+                    ['Account number', '1312115776'],
+                  ].map(([label, value]) => (
+                    <div key={label} className="flex items-center justify-between gap-3">
+                      <span className="text-sm text-teal-600">{label}</span>
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard?.writeText(value)}
+                        className="font-black text-teal-900 text-right hover:underline"
+                        title="Tap to copy"
+                      >
+                        {value}
+                      </button>
+                    </div>
+                  ))}
+                  <p className="text-xs text-teal-500 pt-1">Tap any detail to copy it.</p>
+                </div>
+
+                <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4">
+                  <p className="text-sm font-bold text-teal-900 mb-1">Your code (put it in your email to us)</p>
+                  <p className="font-mono bg-white px-3 py-2 rounded-lg text-teal-900 border border-yellow-400">
+                    {accessCode ? accessCode.toUpperCase() : 'JW Deposit'}
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-center text-teal-600 text-sm font-bold mb-3">Other ways to pay</p>
+
               {/* Zelle instructions */}
               <div className="bg-white border-3 border-teal-200 rounded-2xl p-5 mb-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -2021,7 +2077,7 @@ export default function JobWingmanPortal() {
                   </div>
                   <div>
                     <h3 className="font-black text-teal-900">Pay with Zelle</h3>
-                    <p className="text-teal-500 text-sm">Fastest option - no fees</p>
+                    <p className="text-teal-500 text-sm">No fees</p>
                   </div>
                 </div>
                 
@@ -2083,7 +2139,7 @@ export default function JobWingmanPortal() {
                 </li>
                 <li className="flex gap-3 text-teal-100">
                   <span className="w-6 h-6 bg-yellow-300 rounded-full flex items-center justify-center text-teal-900 font-bold text-sm flex-shrink-0">4</span>
-                  <span>We get started within 48 hours of the kickoff call</span>
+                  <span>Applications start on a Monday once your resume is approved and your deposit is in, as long as both are done by Thursday 11:59 PM Eastern</span>
                 </li>
               </ol>
             </div>

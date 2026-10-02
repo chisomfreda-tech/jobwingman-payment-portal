@@ -44,6 +44,8 @@ export default async function handler(req, res) {
 
   // Memo instruction - use access code if available
   const memoText = accessCode ? accessCode.toUpperCase() : 'JW Deposit';
+  // What to send now: the whole total, or the deposit on a payment plan.
+  const amountDue = paymentType === 'full' ? total : deposit;
 
   const emailHtml = `
 <!DOCTYPE html>
@@ -78,7 +80,11 @@ export default async function handler(req, res) {
     ${paymentHtml}
     
     <div style="background: #fef3c7; border-radius: 8px; padding: 15px; margin-top: 15px;">
-      <p style="margin: 0 0 8px; font-weight: bold; color: #92400e;">Send payment via Zelle:</p>
+      <p style="margin: 0 0 8px; font-weight: bold; color: #92400e;">Pay with LemFi (no transfer fees):</p>
+      <p style="margin: 0 0 10px; font-size: 13px; color: #134e4a; line-height: 1.6;">Download LemFi, verify your ID, then Send money &rarr; Nigeria &rarr; Bank account. Send <strong>$${amountDue}</strong> in US dollars to:<br>
+        Bank: <strong>Zenith Bank</strong><br>Account name: <strong>Job Wingman LTD</strong><br>Account number: <strong>1312115776</strong><br>
+        Then email the confirmation screenshot to wingman@thejobwingman.com with your code below.</p>
+      <p style="margin: 12px 0 8px; font-weight: bold; color: #92400e;">Or send via Zelle:</p>
       <p style="margin: 0; font-size: 18px; color: #134e4a;">(628) 228-1964</p>
       <p style="margin: 5px 0 0; font-size: 12px; color: #666;">Will show as "Chisom Egwuatu"</p>
       <p style="margin: 10px 0 0; font-weight: bold; color: #92400e;">Memo: <span style="font-family: monospace; background: #fff; padding: 2px 8px; border-radius: 4px;">${memoText}</span></p>
@@ -88,10 +94,10 @@ export default async function handler(req, res) {
   <div style="background: #fff; border: 2px solid #e5e5e5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
     <h2 style="margin: 0 0 15px; font-size: 16px; color: #134e4a;">Next Steps</h2>
     <ol style="margin: 0; padding-left: 20px; color: #666;">
-      <li style="margin-bottom: 12px;">Send your ${paymentType === 'full' ? 'payment' : 'deposit'} via Zelle or Venmo</li>
-      <li style="margin-bottom: 12px;"><a href="https://forms.fillout.com/t/17S72kpyV1us" style="color: #14b8a6; font-weight: bold;">Fill out the Intake Form</a> (~10 min)</li>
+      <li style="margin-bottom: 12px;">Send your ${paymentType === 'full' ? 'payment' : 'deposit'} via LemFi, Zelle or Venmo</li>
+      <li style="margin-bottom: 12px;"><a href="https://dashboard.thejobwingman.com/intake" style="color: #14b8a6; font-weight: bold;">Fill out the Intake Form</a> (~10 min)</li>
       <li style="margin-bottom: 12px;">Once payment clears, we'll send you a link to schedule your <strong>Kickoff Call</strong> (15 min)</li>
-      <li style="margin-bottom: 0;">We get started within 48 hours of the kickoff call!</li>
+      <li style="margin-bottom: 0;">Applications start on a Monday once your resume is approved and your deposit is in, as long as both are done by Thursday 11:59 PM Eastern.</li>
     </ol>
   </div>
 
@@ -104,15 +110,15 @@ export default async function handler(req, res) {
     <div style="font-size: 12px; color: #666; line-height: 1.6;">
       <p style="margin: 0 0 10px;"><strong>1. Services.</strong> Job Wingman ("JW") agrees to provide the job search services selected above for the duration specified. Services include resume writing, job applications, and any add-ons selected.</p>
       
-      <p style="margin: 0 0 10px;"><strong>2. What We Do.</strong> We submit applications on your behalf to positions matching your criteria. We target a minimum of 400 applications per month of service. We cannot guarantee interviews or job offers, as hiring decisions are made by employers.</p>
+      <p style="margin: 0 0 10px;"><strong>2. What We Do.</strong> We submit applications on your behalf to positions matching your criteria. We target a minimum of 400 applications in each 30-day period of service. We cannot guarantee interviews or job offers, as hiring decisions are made by employers.</p>
       
       <p style="margin: 0 0 10px;"><strong>3. What You Do.</strong> You agree to provide accurate information about your background, respond to our communications within 48 hours, and notify us of any interviews or offers received.</p>
       
-      <p style="margin: 0 0 10px;"><strong>4. Payment.</strong> A deposit is required before services begin. For payment plans, remaining installments begin one week after applications go live. We accept Zelle and Venmo.</p>
+      <p style="margin: 0 0 10px;"><strong>4. Payment.</strong> A deposit is required before services begin. For payment plans, remaining installments are due on Mondays, beginning one week after applications go live. We accept payment by LemFi transfer to our Nigerian bank account (Job Wingman LTD, Zenith Bank), Zelle, and Venmo.</p>
       
       <p style="margin: 0 0 10px;"><strong>5. Refunds.</strong> Resume services are non-refundable once work begins. Application services may be paused but are non-refundable. If you land a job, unused months can be credited toward future services.</p>
       
-      <p style="margin: 0 0 10px;"><strong>6. Timeline.</strong> Resume drafts delivered within 3 weeks. Applications begin within 48 hours of receiving your approved resume and intake form.</p>
+      <p style="margin: 0 0 10px;"><strong>6. Timeline.</strong> Resume drafts delivered within 3 weeks. Applications begin on a Monday. To start on a given Monday, your approved resume, completed intake form, and deposit must all be received by the Thursday before at 11:59 PM Eastern Time; otherwise applications begin the following Monday.</p>
       
       <p style="margin: 0 0 10px;"><strong>7. Communication.</strong> We provide weekly updates on application activity. You can reach us via email for questions.</p>
       
