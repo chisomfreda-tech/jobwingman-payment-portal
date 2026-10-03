@@ -291,7 +291,7 @@ const MonthButton = ({ months, selected, onClick, popular }) => (
       </div>
     )}
     <div className="text-2xl font-black">{months}</div>
-    <div className={`text-xs ${selected ? 'text-teal-100' : 'text-teal-600'}`}>{months * 400} applications</div>
+    <div className={`text-xs ${selected ? 'text-teal-100' : 'text-teal-600'}`}>{months * 250} applications</div>
     <div className={selected ? 'text-teal-100' : 'text-teal-500'}>${months * 199}</div>
   </button>
 );
@@ -717,7 +717,7 @@ export default function JobWingmanPortal() {
       if (appMonths) {
         const appCost = appMonths * 199;
         total += appCost;
-        items.push({ name: `${appMonths} application campaign${appMonths > 1 ? 's' : ''} (${appMonths * 400} applications)`, price: appCost });
+        items.push({ name: `${appMonths} application campaign${appMonths > 1 ? 's' : ''} (${appMonths * 250} applications)`, price: appCost });
       }
     }
     
@@ -1362,14 +1362,14 @@ export default function JobWingmanPortal() {
           <p className="text-teal-600 mb-6">This is the core of what we do. We apply to jobs on your behalf while you focus on interviews and prep.</p>
           
           <Wingman 
-            message="We apply to every job that matches your criteria: 400 applications per campaign, usually over about 2 months. About half our clients get their first interview request within 4 weeks, and most within 2 months. I usually suggest at least 2 campaigns since job searches take time, but it's up to you."
+            message="We apply to every job that matches your criteria: 250 applications per campaign, usually over about 6 weeks. About half our clients get their first interview request within 4 weeks, and most within 2 months. I usually suggest at least 2 campaigns since job searches take time, but it's up to you."
           />
           
           <div className="bg-white border-3 border-teal-200 rounded-2xl p-6 mb-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <h3 className="font-black text-teal-900 text-xl">Application Service</h3>
-                <p className="text-teal-500">400 applications per campaign · usually about 2 months</p>
+                <p className="text-teal-500">250 applications per campaign · usually about 6 weeks</p>
               </div>
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-teal-900">$199</span>
@@ -1394,7 +1394,7 @@ export default function JobWingmanPortal() {
               <h4 className="font-bold text-teal-800 mb-3">What's included:</h4>
               <div className="grid md:grid-cols-2 gap-2">
                 {[
-                  '400 applications per campaign',
+                  '250 applications per campaign',
                   'We apply daily on your behalf',
                   'Every job matching your criteria',
                   'Spreadsheet to track everything',
