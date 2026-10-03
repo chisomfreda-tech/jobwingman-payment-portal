@@ -31,9 +31,7 @@ const TopNav = ({ currentPage, setCurrentPage, showNav }) => {
     <div className="fixed top-0 left-0 right-0 bg-cream border-b-4 border-teal-900 z-50">
       <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-teal-500 border-3 border-teal-900 rounded-xl flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(19,78,74,1)]">
-            <span className="text-white font-black text-sm">JW</span>
-          </div>
+          <img src="/brand/jw-logo-64.png" alt="" className="w-10 h-10 rounded-full border-3 border-teal-900 shadow-[2px_2px_0px_0px_rgba(19,78,74,1)]" />
           <span className="font-black text-teal-900 text-lg hidden sm:block">Job Wingman</span>
         </div>
         
@@ -68,9 +66,7 @@ const TopNav = ({ currentPage, setCurrentPage, showNav }) => {
 const Wingman = ({ message }) => {
   return (
     <div className="relative bg-cream border-3 border-teal-800 rounded-2xl p-4 mb-6 shadow-[4px_4px_0px_0px_rgba(19,78,74,1)]">
-      <div className="absolute -top-4 -left-2 w-10 h-10 bg-teal-500 border-3 border-teal-800 rounded-full flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(19,78,74,1)]">
-        <span className="text-white font-black text-xs">JW</span>
-      </div>
+      <img src="/brand/jw-logo-64.png" alt="" className="absolute -top-4 -left-2 w-10 h-10 rounded-full border-3 border-teal-800 shadow-[2px_2px_0px_0px_rgba(19,78,74,1)]" />
       <p className="text-teal-900 leading-relaxed ml-6">{message}</p>
     </div>
   );
@@ -805,9 +801,7 @@ export default function JobWingmanPortal() {
           
           <div className="relative bg-cream border-4 border-teal-900 rounded-3xl shadow-[8px_8px_0px_0px_rgba(19,78,74,1)] p-8 w-full max-w-md">
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-teal-500 border-4 border-teal-900 rounded-2xl flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(19,78,74,1)] rotate-3 mx-auto">
-                <span className="text-3xl font-black text-white">JW</span>
-              </div>
+              <img src="/brand/jw-logo-192.png" alt="" className="w-20 h-20 rounded-full border-4 border-teal-900 shadow-[4px_4px_0px_0px_rgba(19,78,74,1)] mx-auto" />
               <h1 className="text-3xl font-black text-teal-900 mt-6">Job Wingman</h1>
               <p className="text-teal-600 mt-2">Your job search co-pilot</p>
             </div>
