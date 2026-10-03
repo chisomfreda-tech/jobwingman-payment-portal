@@ -3,6 +3,16 @@
 // Uses SUPABASE_SERVICE_ROLE_KEY to bypass RLS — safe because this runs on Vercel, never in the browser.
 
 import { createClient } from '@supabase/supabase-js';
+import { AGREEMENT_VERSION, AGREEMENT_SECTIONS, ACCEPTANCE_TEXT } from '../shared/agreement.js';
+
+// Installments are due on Mondays (service agreement, section 4): move a date
+// forward to the Monday on or after it.
+function onOrAfterMonday(d) {
+  const out = new Date(d);
+  const add = (8 - out.getDay()) % 7;   // Sunday 0 -> 1 day, Monday 1 -> 0 days
+  out.setDate(out.getDate() + add);
+  return out;
+}
 
 const supabaseUrl = process.env.SUPABASE_URL || 'https://dpgisnslhirfljwerrci.supabase.co';
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -29,7 +39,7 @@ function buildSchedule({ paymentType, deposit, installments, installmentAmount, 
       schedule.push({
         label: `Installment ${i} of ${installments}`,
         amount: installmentAmount,
-        due_date: installmentDate.toISOString().split('T')[0],
+        due_date: onOrAfterMonday(installmentDate).toISOString().split('T')[0],
         status: 'upcoming',
       });
     }
@@ -104,6 +114,15 @@ export default async function handler(req, res) {
       package_type: packageType,
       payment_schedule: schedule,                    // NEW — jsonb array of installments
       notes: accessCode ? `Access code: ${accessCode.toUpperCase()}` : null,
+      // The one acceptance of the Client Service Agreement, Terms of Use and
+      // Privacy Policy: which wording, when, from where. The server's own copy
+      // of the text is stored, not the browser's, so it can't be altered.
+      ...(req.body.agreement?.accepted === true ? {
+        agreement_version: AGREEMENT_VERSION,
+        agreement_accepted_at: new Date().toISOString(),
+        agreement_accepted_ip: String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || null,
+        agreement_snapshot: { acceptance: ACCEPTANCE_TEXT, sections: AGREEMENT_SECTIONS },
+      } : {}),
     };
 
     const { data: order, error: orderError } = await supabase

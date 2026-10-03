@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AGREEMENT_VERSION, AGREEMENT_SECTIONS, ACCEPTANCE_TEXT, TERMS_OF_USE_URL, PRIVACY_POLICY_URL, LEMFI_GUIDE_URL } from '../shared/agreement.js'
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase client.
@@ -289,7 +290,8 @@ const MonthButton = ({ months, selected, onClick, popular }) => (
         <span className="bg-coral text-white text-xs font-bold px-2 py-1 rounded-full border-2 border-teal-800">⭐</span>
       </div>
     )}
-    <div className="text-2xl font-black">{months} mo</div>
+    <div className="text-2xl font-black">{months}</div>
+    <div className={`text-xs ${selected ? 'text-teal-100' : 'text-teal-600'}`}>{months * 250} applications</div>
     <div className={selected ? 'text-teal-100' : 'text-teal-500'}>${months * 199}</div>
   </button>
 );
@@ -445,6 +447,9 @@ export default function JobWingmanPortal() {
               deposit: paymentPlan.deposit,
               installments: paymentPlan.installments,
               installmentAmount: paymentPlan.perInstallment,
+              // The one acceptance of the legal documents; the server adds the
+              // time and IP and stores the agreement text with the order.
+              agreement: { version: AGREEMENT_VERSION, accepted: agreed === true, text: ACCEPTANCE_TEXT },
             }),
           });
 
@@ -583,7 +588,7 @@ export default function JobWingmanPortal() {
       price: 199,
       description: '"My resume is solid and I\'m already getting some interviews. I just need more volume."',
       includes: [
-        '1 month of applications (400+ minimum)',
+        '1 application campaign (400 applications)',
         '1 job title'
       ],
       best: 'Resume ready, just need the legwork handled'
@@ -595,7 +600,7 @@ export default function JobWingmanPortal() {
       description: '"I\'ve been applying for months with no results. Something isn\'t working."',
       includes: [
         'Resume tune-up (ATS check, AI cleanup, stronger bullets)',
-        '1 month of applications (400+ minimum)',
+        '1 application campaign (400 applications)',
         '1 job title'
       ],
       best: 'Stuck in a rut, need a reset'
@@ -608,7 +613,7 @@ export default function JobWingmanPortal() {
       description: '"I just got laid off. I need to rebuild and move fast."',
       includes: [
         'Full resume rewrite (we interview you, rebuild from scratch)',
-        '1 month of applications (400+ minimum)',
+        '1 application campaign (400 applications)',
         'Post-apply recruiter outreach',
         '1 job title'
       ],
@@ -623,7 +628,7 @@ export default function JobWingmanPortal() {
       description: '"I need sponsorship and have limited time. Every application has to count."',
       includes: [
         'Full resume rewrite (we interview you, rebuild from scratch)',
-        '2 months of applications (400+ minimum)',
+        '2 application campaigns (800 applications)',
         '20 tailored applications',
         '20 cover letters',
         'Post-apply recruiter outreach',
@@ -712,7 +717,7 @@ export default function JobWingmanPortal() {
       if (appMonths) {
         const appCost = appMonths * 199;
         total += appCost;
-        items.push({ name: `${appMonths} month${appMonths > 1 ? 's' : ''} of applications`, price: appCost });
+        items.push({ name: `${appMonths} application campaign${appMonths > 1 ? 's' : ''} (${appMonths * 250} applications)`, price: appCost });
       }
     }
     
@@ -945,13 +950,13 @@ export default function JobWingmanPortal() {
                 
                 <div className="text-center p-4 bg-teal-500 rounded-2xl">
                   <div className="text-sm font-bold text-teal-100 uppercase tracking-wide mb-2">After Job Wingman</div>
-                  <div className="text-4xl font-black text-white mb-1">6 days</div>
-                  <div className="text-teal-100">to first interview</div>
-                  <div className="text-3xl font-black text-white mt-4 mb-1">4+</div>
-                  <div className="text-teal-100">interviews per month</div>
+                  <div className="text-4xl font-black text-white mb-1">10 days</div>
+                  <div className="text-teal-100">typical time to first interview request</div>
+                  <div className="text-3xl font-black text-white mt-4 mb-1">13 of 15</div>
+                  <div className="text-teal-100">clients got interview requests within 2 months</div>
                 </div>
               </div>
-              <p className="text-center text-teal-500 text-xs mt-4">Data from client intake forms</p>
+              <p className="text-center text-teal-500 text-xs mt-4">"Before": from client intake forms. "After": Job Wingman campaigns started in 2026. Individual results vary.</p>
             </div>
             
             {/* Stories */}
@@ -1357,22 +1362,22 @@ export default function JobWingmanPortal() {
           <p className="text-teal-600 mb-6">This is the core of what we do. We apply to jobs on your behalf while you focus on interviews and prep.</p>
           
           <Wingman 
-            message="We apply to every job that matches your criteria — 400 minimum guaranteed. Most people start seeing interview requests within 2-4 weeks. I usually suggest at least 2 months since job searches take time, but it's up to you."
+            message="We apply to every job that matches your criteria: 250 applications per campaign, usually over about 6 weeks. About half our clients get their first interview request within 4 weeks, and most within 2 months. I usually suggest at least 2 campaigns since job searches take time, but it's up to you."
           />
           
           <div className="bg-white border-3 border-teal-200 rounded-2xl p-6 mb-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <h3 className="font-black text-teal-900 text-xl">Application Service</h3>
-                <p className="text-teal-500">400+ applications minimum</p>
+                <p className="text-teal-500">250 applications per campaign · usually about 6 weeks</p>
               </div>
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-teal-900">$199</span>
-                <span className="text-teal-400 font-medium">/month</span>
+                <span className="text-teal-400 font-medium">/campaign</span>
               </div>
             </div>
             
-            <p className="text-teal-700 font-medium mb-3">How many months?</p>
+            <p className="text-teal-700 font-medium mb-3">How many campaigns?</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
               {[1, 2, 3, 4].map((months) => (
                 <MonthButton
@@ -1389,7 +1394,7 @@ export default function JobWingmanPortal() {
               <h4 className="font-bold text-teal-800 mb-3">What's included:</h4>
               <div className="grid md:grid-cols-2 gap-2">
                 {[
-                  '400+ applications minimum',
+                  '250 applications per campaign',
                   'We apply daily on your behalf',
                   'Every job matching your criteria',
                   'Spreadsheet to track everything',
@@ -1753,7 +1758,7 @@ export default function JobWingmanPortal() {
                   </li>
                   <li className="flex gap-2">
                     <span className="font-bold text-teal-500">3.</span>
-                    Once payment is in, we get started within 48 hours
+                    Once payment is in, we'll schedule your kickoff and confirm your Monday start date
                   </li>
                 </ol>
               </div>
@@ -1867,7 +1872,7 @@ export default function JobWingmanPortal() {
                 onClick={() => setShowTerms(!showTerms)}
               >
                 <div className="flex justify-between items-center">
-                  <p className="font-bold text-teal-900">Terms of Service</p>
+                  <p className="font-bold text-teal-900">Client Service Agreement</p>
                   <span className={`text-teal-500 transition-transform ${showTerms ? 'rotate-180' : ''}`}>
                     ▼
                   </span>
@@ -1875,21 +1880,10 @@ export default function JobWingmanPortal() {
                 
                 {showTerms && (
                   <div className="mt-4 pt-4 border-t border-teal-200 text-sm text-teal-700 space-y-3 max-h-64 overflow-y-auto">
-                    <p><strong>1. Services.</strong> Job Wingman ("JW") agrees to provide the job search services selected above for the duration specified. Services include resume writing, job applications, and any add-ons selected.</p>
-                    
-                    <p><strong>2. What We Do.</strong> We submit applications on your behalf to positions matching your criteria. We target a minimum of 400 applications per month of service. We cannot guarantee interviews or job offers, as hiring decisions are made by employers.</p>
-                    
-                    <p><strong>3. What You Do.</strong> You agree to provide accurate information about your background, respond to our communications within 48 hours, and notify us of any interviews or offers received.</p>
-                    
-                    <p><strong>4. Payment.</strong> A deposit is required before services begin. For payment plans, remaining installments begin one week after applications go live. We accept Zelle and Venmo.</p>
-                    
-                    <p><strong>5. Refunds.</strong> Resume services are non-refundable once work begins. Application services may be paused but are non-refundable. If you land a job, unused months can be credited toward future services.</p>
-                    
-                    <p><strong>6. Timeline.</strong> Resume drafts delivered within 3 weeks. Applications begin within 48 hours of receiving your approved resume and intake form.</p>
-                    
-                    <p><strong>7. Communication.</strong> We provide weekly updates on application activity. You can reach us via email or text for questions.</p>
-                    
-                    <p><strong>8. Results Disclaimer.</strong> While we work hard to maximize your interview opportunities, job search outcomes depend on many factors outside our control including market conditions, your qualifications, and employer decisions.</p>
+                    {AGREEMENT_SECTIONS.map(([title, text]) => (
+                      <p key={title}><strong>{title}</strong> {text}</p>
+                    ))}
+                    <p className="text-xs text-teal-500">Version {AGREEMENT_VERSION}</p>
                   </div>
                 )}
               </div>
@@ -1916,7 +1910,7 @@ export default function JobWingmanPortal() {
                   </div>
                 </div>
                 <span className="text-teal-700 text-sm">
-                  I have read and agree to the <button type="button" onClick={(e) => { e.preventDefault(); setShowTerms(true); }} className="text-teal-600 underline font-bold hover:text-teal-800">Terms of Service</button>. I understand that Job Wingman will apply to jobs on my behalf and that results are not guaranteed.
+                  I have read and agree to the <button type="button" onClick={(e) => { e.preventDefault(); setShowTerms(true); }} className="text-teal-600 underline font-bold hover:text-teal-800">Client Service Agreement</button> and the <a href={TERMS_OF_USE_URL} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-teal-600 underline font-bold hover:text-teal-800">Terms of Use</a>, and I acknowledge the <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-teal-600 underline font-bold hover:text-teal-800">Privacy Policy</a>. I understand that Job Wingman will apply to jobs on my behalf and that results are not guaranteed.
                 </span>
               </label>
             </div>
@@ -2013,40 +2007,64 @@ export default function JobWingmanPortal() {
                 )}
               </div>
               
-              {/* Zelle instructions */}
-              <div className="bg-white border-3 border-teal-200 rounded-2xl p-5 mb-6">
+              {/* LemFi instructions: the main way to pay (added Oct 2026).
+                  Money goes to Job Wingman LTD's Zenith Bank naira account; LemFi
+                  converts the client's dollars. LemFi only supports UBA and Access
+                  USD (domiciliary) accounts, so a Zenith account receives naira. */}
+              <div className="bg-white border-3 border-teal-500 rounded-2xl p-5 mb-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center">
-                    <span className="text-white font-black text-lg">Z</span>
+                  <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center">
+                    <span className="text-white font-black text-lg">L</span>
                   </div>
                   <div>
-                    <h3 className="font-black text-teal-900">Pay with Zelle</h3>
-                    <p className="text-teal-500 text-sm">Fastest option - no fees</p>
+                    <h3 className="font-black text-teal-900">Pay with LemFi</h3>
+                    <p className="text-teal-500 text-sm">No transfer fees · send from your US bank or debit card</p>
                   </div>
                 </div>
-                
-                <div className="bg-teal-50 rounded-xl p-4 mb-4">
-                  <p className="text-sm text-teal-600 mb-2">Send to:</p>
-                  <p className="text-xl font-black text-teal-900 mb-1">(628) 228-1964</p>
-                  <p className="text-teal-500 text-sm">Will show as "Chisom Egwuatu"</p>
+
+                <a href={LEMFI_GUIDE_URL} target="_blank" rel="noopener noreferrer"
+                  className="block text-center mb-4 px-4 py-3 rounded-xl bg-teal-50 border-2 border-teal-300 text-teal-800 font-bold hover:border-teal-500">
+                  First time using LemFi? Open the full step-by-step guide →
+                </a>
+                <ol className="space-y-3 text-sm text-teal-800 mb-4">
+                  <li className="flex gap-3"><span className="font-black text-teal-500">1.</span><span>Download <a href="https://lemfi.com/en-us" target="_blank" rel="noopener noreferrer" className="font-bold underline">LemFi</a> from the App Store or Google Play and create an account.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">2.</span><span>Verify your identity in the app: a US photo ID, a selfie, and your Social Security Number or ITIN. This usually takes a few minutes.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">3.</span><span>Tap <strong>Send money</strong>, choose <strong>US dollars → Nigerian naira</strong>, then <strong>Bank account</strong>. Pick <strong>Zenith Bank</strong>, enter the account number below, and check the name shows <strong>Job Wingman LTD</strong>.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">4.</span><span>In <strong>You send</strong>, enter <strong>${amountDue}</strong> in US dollars. LemFi shows what arrives in naira; that's expected.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">5.</span><span>Choose your US bank account or debit card, check the total (no transfer fee), and approve with your LemFi PIN. Screenshot the confirmation.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">6.</span><span>Email the confirmation screenshot to <a href="mailto:wingman@thejobwingman.com" className="font-bold underline">wingman@thejobwingman.com</a> with your code below, so we can match it to you.</span></li>
+                </ol>
+
+                <div className="bg-teal-50 rounded-xl p-4 mb-4 space-y-2">
+                  <p className="text-sm text-teal-600">Recipient:</p>
+                  {[
+                    ['Bank', 'Zenith Bank'],
+                    ['Account name', 'Job Wingman LTD'],
+                    ['Account number', '1312115776'],
+                  ].map(([label, value]) => (
+                    <div key={label} className="flex items-center justify-between gap-3">
+                      <span className="text-sm text-teal-600">{label}</span>
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard?.writeText(value)}
+                        className="font-black text-teal-900 text-right hover:underline"
+                        title="Tap to copy"
+                      >
+                        {value}
+                      </button>
+                    </div>
+                  ))}
+                  <p className="text-xs text-teal-500 pt-1">Tap any detail to copy it.</p>
                 </div>
-                
+
                 <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4">
-                  <p className="text-sm font-bold text-teal-900 mb-1">📝 Important: Include this memo</p>
+                  <p className="text-sm font-bold text-teal-900 mb-1">Your code (put it in your email to us)</p>
                   <p className="font-mono bg-white px-3 py-2 rounded-lg text-teal-900 border border-yellow-400">
                     {accessCode ? accessCode.toUpperCase() : 'JW Deposit'}
                   </p>
                 </div>
               </div>
-              
-              {/* Alternative payment */}
-              <div className="text-center mb-6">
-                <p className="text-teal-500 text-sm mb-2">Don't have Zelle?</p>
-                <a href="https://venmo.com/ChisomEgwuatu" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white border-2 border-teal-200 rounded-xl text-teal-700 font-medium text-sm hover:border-teal-400 transition">
-                  Venmo (@ChisomEgwuatu)
-                </a>
-              </div>
-              
+
               {/* Order summary */}
               <div className="border-t-2 border-teal-100 pt-6">
                 <h4 className="font-bold text-teal-900 mb-3">Your Package</h4>
@@ -2083,7 +2101,7 @@ export default function JobWingmanPortal() {
                 </li>
                 <li className="flex gap-3 text-teal-100">
                   <span className="w-6 h-6 bg-yellow-300 rounded-full flex items-center justify-center text-teal-900 font-bold text-sm flex-shrink-0">4</span>
-                  <span>We get started within 48 hours of the kickoff call</span>
+                  <span>Applications start on a Monday once your resume is approved and your deposit is in, as long as both are done by Thursday 11:59 PM Eastern</span>
                 </li>
               </ol>
             </div>
