@@ -1,5 +1,6 @@
 // api/send-confirmation.js
 // Vercel serverless function to send confirmation email via Resend
+import { AGREEMENT_VERSION, AGREEMENT_SECTIONS, LEMFI_GUIDE_URL, TERMS_OF_USE_URL, PRIVACY_POLICY_URL } from '../shared/agreement.js'
 
 export default async function handler(req, res) {
   // Only allow POST
@@ -83,7 +84,8 @@ export default async function handler(req, res) {
       <p style="margin: 0 0 8px; font-weight: bold; color: #92400e;">Pay with LemFi (no transfer fees):</p>
       <p style="margin: 0 0 10px; font-size: 13px; color: #134e4a; line-height: 1.6;">Download LemFi, verify your ID, then Send money &rarr; Nigeria &rarr; Bank account. Send <strong>$${amountDue}</strong> in US dollars to:<br>
         Bank: <strong>Zenith Bank</strong><br>Account name: <strong>Job Wingman LTD</strong><br>Account number: <strong>1312115776</strong><br>
-        Then email the confirmation screenshot to wingman@thejobwingman.com with your code below.</p>
+        Then email the confirmation screenshot to wingman@thejobwingman.com with your code below.<br>
+        First time? <a href="${LEMFI_GUIDE_URL}" style="color: #14b8a6; font-weight: bold;">Full step-by-step LemFi guide</a></p>
       <p style="margin: 10px 0 0; font-weight: bold; color: #92400e;">Your code: <span style="font-family: monospace; background: #fff; padding: 2px 8px; border-radius: 4px;">${memoText}</span></p>
     </div>
   </div>
@@ -105,22 +107,9 @@ export default async function handler(req, res) {
     </div>
     
     <div style="font-size: 12px; color: #666; line-height: 1.6;">
-      <p style="margin: 0 0 10px;"><strong>1. Services.</strong> Job Wingman ("JW") agrees to provide the job search services selected above for the duration specified. Services include resume writing, job applications, and any add-ons selected.</p>
-      
-      <p style="margin: 0 0 10px;"><strong>2. What We Do.</strong> We submit applications on your behalf to positions matching your criteria. We target a minimum of 400 applications in each 30-day period of service. We cannot guarantee interviews or job offers, as hiring decisions are made by employers.</p>
-      
-      <p style="margin: 0 0 10px;"><strong>3. What You Do.</strong> You agree to provide accurate information about your background, respond to our communications within 48 hours, and notify us of any interviews or offers received.</p>
-      
-      <p style="margin: 0 0 10px;"><strong>4. Payment.</strong> A deposit is required before services begin. For payment plans, remaining installments are due on Mondays, beginning one week after applications go live. We accept payment by transfer to our bank account (Job Wingman LTD, Zenith Bank), sent through LemFi.</p>
-      
-      <p style="margin: 0 0 10px;"><strong>5. Refunds.</strong> Resume services are non-refundable once work begins. Application services may be paused but are non-refundable. If you land a job, unused months can be credited toward future services.</p>
-      
-      <p style="margin: 0 0 10px;"><strong>6. Timeline.</strong> Resume drafts delivered within 3 weeks. Applications begin on a Monday. To start on a given Monday, your approved resume, completed intake form, and deposit must all be received by the Thursday before at 11:59 PM Eastern Time; otherwise applications begin the following Monday.</p>
-      
-      <p style="margin: 0 0 10px;"><strong>7. Communication.</strong> We provide weekly updates on application activity. You can reach us via email for questions.</p>
-      
-      <p style="margin: 0 0 15px;"><strong>8. Results Disclaimer.</strong> While we work hard to maximize your interview opportunities, job search outcomes depend on many factors outside our control including market conditions, your qualifications, and employer decisions.</p>
-      
+      ${AGREEMENT_SECTIONS.map(([title, text]) => `<p style="margin: 0 0 10px;"><strong>${title}</strong> ${text}</p>`).join('\n      ')}
+      <p style="margin: 0 0 15px; font-size: 11px;">Version ${AGREEMENT_VERSION}. You also agreed to our <a href="${TERMS_OF_USE_URL}" style="color: #14b8a6;">Terms of Use</a> and acknowledged our <a href="${PRIVACY_POLICY_URL}" style="color: #14b8a6;">Privacy Policy</a>.</p>
+
       <div style="background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px; text-align: center;">
         <p style="margin: 0; font-size: 11px; color: #666;">
           <strong style="color: #134e4a;">${clientName}</strong> agreed to these terms on <strong style="color: #134e4a;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</strong>

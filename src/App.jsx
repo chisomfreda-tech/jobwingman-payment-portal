@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AGREEMENT_VERSION, AGREEMENT_SECTIONS, ACCEPTANCE_TEXT, TERMS_OF_USE_URL, PRIVACY_POLICY_URL, LEMFI_GUIDE_URL } from '../shared/agreement.js'
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase client.
@@ -445,6 +446,9 @@ export default function JobWingmanPortal() {
               deposit: paymentPlan.deposit,
               installments: paymentPlan.installments,
               installmentAmount: paymentPlan.perInstallment,
+              // The one acceptance of the legal documents; the server adds the
+              // time and IP and stores the agreement text with the order.
+              agreement: { version: AGREEMENT_VERSION, accepted: agreed === true, text: ACCEPTANCE_TEXT },
             }),
           });
 
@@ -1867,7 +1871,7 @@ export default function JobWingmanPortal() {
                 onClick={() => setShowTerms(!showTerms)}
               >
                 <div className="flex justify-between items-center">
-                  <p className="font-bold text-teal-900">Terms of Service</p>
+                  <p className="font-bold text-teal-900">Client Service Agreement</p>
                   <span className={`text-teal-500 transition-transform ${showTerms ? 'rotate-180' : ''}`}>
                     ▼
                   </span>
@@ -1875,21 +1879,10 @@ export default function JobWingmanPortal() {
                 
                 {showTerms && (
                   <div className="mt-4 pt-4 border-t border-teal-200 text-sm text-teal-700 space-y-3 max-h-64 overflow-y-auto">
-                    <p><strong>1. Services.</strong> Job Wingman ("JW") agrees to provide the job search services selected above for the duration specified. Services include resume writing, job applications, and any add-ons selected.</p>
-                    
-                    <p><strong>2. What We Do.</strong> We submit applications on your behalf to positions matching your criteria. We target a minimum of 400 applications in each 30-day period of service. We cannot guarantee interviews or job offers, as hiring decisions are made by employers.</p>
-                    
-                    <p><strong>3. What You Do.</strong> You agree to provide accurate information about your background, respond to our communications within 48 hours, and notify us of any interviews or offers received.</p>
-                    
-                    <p><strong>4. Payment.</strong> A deposit is required before services begin. For payment plans, remaining installments are due on Mondays, beginning one week after applications go live. We accept payment by transfer to our bank account (Job Wingman LTD, Zenith Bank), sent through LemFi.</p>
-                    
-                    <p><strong>5. Refunds.</strong> Resume services are non-refundable once work begins. Application services may be paused but are non-refundable. If you land a job, unused months can be credited toward future services.</p>
-                    
-                    <p><strong>6. Timeline.</strong> Resume drafts delivered within 3 weeks. Applications begin on a Monday. To start on a given Monday, your approved resume, completed intake form, and deposit must all be received by the Thursday before at 11:59 PM Eastern Time; otherwise applications begin the following Monday.</p>
-                    
-                    <p><strong>7. Communication.</strong> We provide weekly updates on application activity. You can reach us via email or text for questions.</p>
-                    
-                    <p><strong>8. Results Disclaimer.</strong> While we work hard to maximize your interview opportunities, job search outcomes depend on many factors outside our control including market conditions, your qualifications, and employer decisions.</p>
+                    {AGREEMENT_SECTIONS.map(([title, text]) => (
+                      <p key={title}><strong>{title}</strong> {text}</p>
+                    ))}
+                    <p className="text-xs text-teal-500">Version {AGREEMENT_VERSION}</p>
                   </div>
                 )}
               </div>
@@ -1916,7 +1909,7 @@ export default function JobWingmanPortal() {
                   </div>
                 </div>
                 <span className="text-teal-700 text-sm">
-                  I have read and agree to the <button type="button" onClick={(e) => { e.preventDefault(); setShowTerms(true); }} className="text-teal-600 underline font-bold hover:text-teal-800">Terms of Service</button>. I understand that Job Wingman will apply to jobs on my behalf and that results are not guaranteed.
+                  I have read and agree to the <button type="button" onClick={(e) => { e.preventDefault(); setShowTerms(true); }} className="text-teal-600 underline font-bold hover:text-teal-800">Client Service Agreement</button> and the <a href={TERMS_OF_USE_URL} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-teal-600 underline font-bold hover:text-teal-800">Terms of Use</a>, and I acknowledge the <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-teal-600 underline font-bold hover:text-teal-800">Privacy Policy</a>. I understand that Job Wingman will apply to jobs on my behalf and that results are not guaranteed.
                 </span>
               </label>
             </div>
@@ -2028,12 +2021,16 @@ export default function JobWingmanPortal() {
                   </div>
                 </div>
 
+                <a href={LEMFI_GUIDE_URL} target="_blank" rel="noopener noreferrer"
+                  className="block text-center mb-4 px-4 py-3 rounded-xl bg-teal-50 border-2 border-teal-300 text-teal-800 font-bold hover:border-teal-500">
+                  First time using LemFi? Open the full step-by-step guide →
+                </a>
                 <ol className="space-y-3 text-sm text-teal-800 mb-4">
                   <li className="flex gap-3"><span className="font-black text-teal-500">1.</span><span>Download <a href="https://lemfi.com/en-us" target="_blank" rel="noopener noreferrer" className="font-bold underline">LemFi</a> from the App Store or Google Play and create an account.</span></li>
-                  <li className="flex gap-3"><span className="font-black text-teal-500">2.</span><span>Verify your identity in the app (a photo ID and a selfie). This usually takes a few minutes.</span></li>
-                  <li className="flex gap-3"><span className="font-black text-teal-500">3.</span><span>Tap <strong>Send money</strong>, choose <strong>Nigeria</strong>, then <strong>Bank account</strong>, and add the recipient below.</span></li>
-                  <li className="flex gap-3"><span className="font-black text-teal-500">4.</span><span>Enter <strong>${amountDue}</strong> as the amount you send in US dollars. LemFi shows what arrives in naira; that's expected.</span></li>
-                  <li className="flex gap-3"><span className="font-black text-teal-500">5.</span><span>Pay with your US bank account or debit card and confirm.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">2.</span><span>Verify your identity in the app: a US photo ID, a selfie, and your Social Security Number or ITIN. This usually takes a few minutes.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">3.</span><span>Tap <strong>Send money</strong>, choose <strong>US dollars → Nigerian naira</strong>, then <strong>Bank account</strong>. Pick <strong>Zenith Bank</strong>, enter the account number below, and check the name shows <strong>Job Wingman LTD</strong>.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">4.</span><span>In <strong>You send</strong>, enter <strong>${amountDue}</strong> in US dollars. LemFi shows what arrives in naira; that's expected.</span></li>
+                  <li className="flex gap-3"><span className="font-black text-teal-500">5.</span><span>Choose your US bank account or debit card, check the total (no transfer fee), and approve with your LemFi PIN. Screenshot the confirmation.</span></li>
                   <li className="flex gap-3"><span className="font-black text-teal-500">6.</span><span>Email the confirmation screenshot to <a href="mailto:wingman@thejobwingman.com" className="font-bold underline">wingman@thejobwingman.com</a> with your code below, so we can match it to you.</span></li>
                 </ol>
 
