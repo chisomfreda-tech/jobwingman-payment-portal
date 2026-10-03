@@ -290,7 +290,8 @@ const MonthButton = ({ months, selected, onClick, popular }) => (
         <span className="bg-coral text-white text-xs font-bold px-2 py-1 rounded-full border-2 border-teal-800">⭐</span>
       </div>
     )}
-    <div className="text-2xl font-black">{months} mo</div>
+    <div className="text-2xl font-black">{months}</div>
+    <div className={`text-xs ${selected ? 'text-teal-100' : 'text-teal-600'}`}>{months * 400} applications</div>
     <div className={selected ? 'text-teal-100' : 'text-teal-500'}>${months * 199}</div>
   </button>
 );
@@ -587,7 +588,7 @@ export default function JobWingmanPortal() {
       price: 199,
       description: '"My resume is solid and I\'m already getting some interviews. I just need more volume."',
       includes: [
-        '400+ applications in 30 days',
+        '1 application campaign (400 applications)',
         '1 job title'
       ],
       best: 'Resume ready, just need the legwork handled'
@@ -599,7 +600,7 @@ export default function JobWingmanPortal() {
       description: '"I\'ve been applying for months with no results. Something isn\'t working."',
       includes: [
         'Resume tune-up (ATS check, AI cleanup, stronger bullets)',
-        '400+ applications in 30 days',
+        '1 application campaign (400 applications)',
         '1 job title'
       ],
       best: 'Stuck in a rut, need a reset'
@@ -612,7 +613,7 @@ export default function JobWingmanPortal() {
       description: '"I just got laid off. I need to rebuild and move fast."',
       includes: [
         'Full resume rewrite (we interview you, rebuild from scratch)',
-        '400+ applications in 30 days',
+        '1 application campaign (400 applications)',
         'Post-apply recruiter outreach',
         '1 job title'
       ],
@@ -627,7 +628,7 @@ export default function JobWingmanPortal() {
       description: '"I need sponsorship and have limited time. Every application has to count."',
       includes: [
         'Full resume rewrite (we interview you, rebuild from scratch)',
-        'Two 30-day campaigns (400+ applications each)',
+        '2 application campaigns (800 applications)',
         '20 tailored applications',
         '20 cover letters',
         'Post-apply recruiter outreach',
@@ -716,7 +717,7 @@ export default function JobWingmanPortal() {
       if (appMonths) {
         const appCost = appMonths * 199;
         total += appCost;
-        items.push({ name: `${appMonths} month${appMonths > 1 ? 's' : ''} of applications`, price: appCost });
+        items.push({ name: `${appMonths} application campaign${appMonths > 1 ? 's' : ''} (${appMonths * 400} applications)`, price: appCost });
       }
     }
     
@@ -949,13 +950,13 @@ export default function JobWingmanPortal() {
                 
                 <div className="text-center p-4 bg-teal-500 rounded-2xl">
                   <div className="text-sm font-bold text-teal-100 uppercase tracking-wide mb-2">After Job Wingman</div>
-                  <div className="text-4xl font-black text-white mb-1">6 days</div>
-                  <div className="text-teal-100">to first interview</div>
-                  <div className="text-3xl font-black text-white mt-4 mb-1">4+</div>
-                  <div className="text-teal-100">interviews per month</div>
+                  <div className="text-4xl font-black text-white mb-1">10 days</div>
+                  <div className="text-teal-100">typical time to first interview request</div>
+                  <div className="text-3xl font-black text-white mt-4 mb-1">13 of 15</div>
+                  <div className="text-teal-100">clients got interview requests within 2 months</div>
                 </div>
               </div>
-              <p className="text-center text-teal-500 text-xs mt-4">Data from client intake forms</p>
+              <p className="text-center text-teal-500 text-xs mt-4">"Before": from client intake forms. "After": Job Wingman campaigns started in 2026. Individual results vary.</p>
             </div>
             
             {/* Stories */}
@@ -1361,22 +1362,22 @@ export default function JobWingmanPortal() {
           <p className="text-teal-600 mb-6">This is the core of what we do. We apply to jobs on your behalf while you focus on interviews and prep.</p>
           
           <Wingman 
-            message="We apply to every job that matches your criteria — at least 400 in every 30 days. Most people start seeing interview requests within 2-4 weeks. I usually suggest at least 2 months since job searches take time, but it's up to you."
+            message="We apply to every job that matches your criteria: 400 applications per campaign, usually over about 2 months. About half our clients get their first interview request within 4 weeks, and most within 2 months. I usually suggest at least 2 campaigns since job searches take time, but it's up to you."
           />
           
           <div className="bg-white border-3 border-teal-200 rounded-2xl p-6 mb-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <h3 className="font-black text-teal-900 text-xl">Application Service</h3>
-                <p className="text-teal-500">400+ applications in 30 days</p>
+                <p className="text-teal-500">400 applications per campaign · usually about 2 months</p>
               </div>
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-teal-900">$199</span>
-                <span className="text-teal-400 font-medium">/month</span>
+                <span className="text-teal-400 font-medium">/campaign</span>
               </div>
             </div>
             
-            <p className="text-teal-700 font-medium mb-3">How many months?</p>
+            <p className="text-teal-700 font-medium mb-3">How many campaigns?</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
               {[1, 2, 3, 4].map((months) => (
                 <MonthButton
@@ -1393,7 +1394,7 @@ export default function JobWingmanPortal() {
               <h4 className="font-bold text-teal-800 mb-3">What's included:</h4>
               <div className="grid md:grid-cols-2 gap-2">
                 {[
-                  '400+ applications in every 30 days',
+                  '400 applications per campaign',
                   'We apply daily on your behalf',
                   'Every job matching your criteria',
                   'Spreadsheet to track everything',
