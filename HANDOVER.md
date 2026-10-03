@@ -1,5 +1,25 @@
 # Handover
 
+## Current state (3 Oct 2026)
+
+- **Payment:** LemFi to Job Wingman LTD's Zenith Bank naira account; guide at
+  dashboard.thejobwingman.com/pay-with-lemfi (the recipient details there must match
+  `src/App.jsx` and `api/send-confirmation.js`). Zelle, Venmo and bank wire are gone.
+  Paystack (USD to a Zenith USD account) comes next, once Chisom's account is approved;
+  she adds the keys to Vercel herself.
+- **Agreement:** `shared/agreement.js` is the only copy, used by the page, the email and
+  the order record. Bump `AGREEMENT_VERSION` on any wording change. Checkout is the one
+  place a client accepts the agreement + Terms of Use + Privacy Policy; `client_orders`
+  `agreement_*` columns record version, time, IP and text.
+- **Campaigns are counted in applications** (250 for $199 on its own; bundles hold 400),
+  not days. Installments fall on Mondays.
+- **Expected to change:** the bundles, after Chisom's services and pricing rework.
+- To-do list and reasoning: `jw-dashboard/docs/memory/TASKS.md` and `JOURNAL.md`.
+
+---
+
+## Earlier: 14 Sep 2026
+
 Written 14 Sep 2026. Machine setup is in `sift-job-board/HANDOVER.md`.
 
 ## What this is
