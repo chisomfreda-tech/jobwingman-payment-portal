@@ -656,7 +656,6 @@ export default function JobWingmanPortal() {
       includes: [
         'Full resume rewrite (we interview you, rebuild from scratch)',
         '1 application campaign (400 applications)',
-        'Post-apply recruiter outreach',
         '1 job title'
       ],
       best: 'Recently laid off, need momentum',
