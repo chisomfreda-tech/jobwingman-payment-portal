@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AGREEMENT_VERSION, AGREEMENT_SECTIONS, ACCEPTANCE_TEXT, TERMS_OF_USE_URL, PRIVACY_POLICY_URL, LEMFI_GUIDE_URL } from '../shared/agreement.js'
 import { createClient } from '@supabase/supabase-js';
 
@@ -300,6 +300,12 @@ export default function JobWingmanPortal() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [clientId, setClientId] = useState(null); // Supabase client ID
   const [accessCode, setAccessCode] = useState(''); // Client's access code
+  // The bundle the team recommended after the intro call (?rec=<bundle id> in the
+  // email's link). It gets a "Recommended for you" badge instead of "Most Popular",
+  // and the client lands on Pick Your Bundle with it selected.
+  const [recommendedBundle, setRecommendedBundle] = useState(null);
+  // Same value, readable from the login callback, which closes over first-render state.
+  const recommendedRef = useRef(null);
   
   // Name collection state
   const [firstName, setFirstName] = useState('');
@@ -347,18 +353,43 @@ export default function JobWingmanPortal() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const fromLink = params.get('code');
+    const rec = params.get('rec');
+    if (rec) { setRecommendedBundle(rec); recommendedRef.current = rec; }
     if (!fromLink) return;
     params.delete('code');
+    params.delete('rec');
     const rest = params.toString();
     window.history.replaceState(null, '', window.location.pathname + (rest ? `?${rest}` : '') + window.location.hash);
     setPassword(fromLink);
     handleLogin(fromLink);
   }, []);
 
+  // Arriving from the email with a recommendation: bring that bundle into view
+  // (after the scroll-to-top below has run).
+  useEffect(() => {
+    if (currentPage !== 'pricing' || currentStep !== -0.5 || !recommendedRef.current) return;
+    const t = setTimeout(() => {
+      document.getElementById(`bundle-${recommendedRef.current}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
+    return () => clearTimeout(t);
+  }, [currentPage, currentStep]);
+
   // Scroll to top when page or step changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [currentPage, currentStep, authenticated, nameCollected, orderConfirmed, showAgreement]);
+
+  // Straight to Pick Your Bundle with the recommended one selected — when the link
+  // named a bundle that exists.
+  const goToRecommendation = () => {
+    const rec = recommendedRef.current;
+    if (!rec || !bundles.some(b => b.id === rec)) return;
+    setRecommendedBundle(rec);
+    setCurrentPage('pricing');
+    setFlowType('bundle');
+    setSelectedBundle(rec);
+    setCurrentStep(-0.5);
+  };
 
   const handleLogin = async (fromLink) => {
     const code = (typeof fromLink === 'string' ? fromLink : password).toLowerCase().trim();
@@ -390,6 +421,7 @@ export default function JobWingmanPortal() {
         if (data.email) setClientEmail(data.email);
         setAuthenticated(true);
         setNameCollected(!!data.first_name); // Skip name step if we have it
+        goToRecommendation();
       } else if (FALLBACK_PASSWORDS[code]) {
         // Fallback for demo/testing
         setAccessCode(code);
@@ -1091,6 +1123,7 @@ export default function JobWingmanPortal() {
               {bundles.map((bundle) => (
                 <div
                   key={bundle.id}
+                  id={`bundle-${bundle.id}`}
                   onClick={() => setSelectedBundle(bundle.id)}
                   className={`
                     relative p-6 rounded-2xl border-3 cursor-pointer transition-all
@@ -1100,9 +1133,11 @@ export default function JobWingmanPortal() {
                     }
                   `}
                 >
-                  {bundle.popular && (
+                  {(recommendedBundle && bundles.some(b => b.id === recommendedBundle)
+                    ? bundle.id === recommendedBundle
+                    : bundle.popular) && (
                     <div className="absolute -top-3 left-4">
-                      <Sticker color="coral" rotate={-2}>Most Popular</Sticker>
+                      <Sticker color="coral" rotate={-2}>{recommendedBundle === bundle.id ? 'Recommended for you' : 'Most Popular'}</Sticker>
                     </div>
                   )}
                   {bundle.savings && (
