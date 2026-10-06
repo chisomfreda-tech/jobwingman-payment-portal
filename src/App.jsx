@@ -24,6 +24,10 @@ const FALLBACK_PASSWORDS = {
 };
 
 // Navigation component
+// The Results page is hidden until it's updated (owner, 6 Oct 2026). Its page is kept;
+// set this to true to bring back the page and the Results / Pricing tabs.
+const SHOW_RESULTS = false;
+
 const TopNav = ({ currentPage, setCurrentPage, showNav }) => {
   if (!showNav) return null;
   
@@ -35,7 +39,7 @@ const TopNav = ({ currentPage, setCurrentPage, showNav }) => {
           <span className="font-black text-teal-900 text-lg hidden sm:block">Job Wingman</span>
         </div>
         
-        <div className="flex gap-2">
+        {SHOW_RESULTS && <div className="flex gap-2">
           <button
             onClick={() => setCurrentPage('results')}
             className={`px-4 py-2 rounded-xl font-bold text-sm border-3 transition-all ${
@@ -56,7 +60,7 @@ const TopNav = ({ currentPage, setCurrentPage, showNav }) => {
           >
             Pricing
           </button>
-        </div>
+        </div>}
       </div>
     </div>
   );
@@ -319,7 +323,7 @@ export default function JobWingmanPortal() {
   const [nameCollected, setNameCollected] = useState(false);
   
   // Navigation state
-  const [currentPage, setCurrentPage] = useState('results');
+  const [currentPage, setCurrentPage] = useState(SHOW_RESULTS ? 'results' : 'pricing');
   
   // Pricing flow state
   const [currentStep, setCurrentStep] = useState(-1);
@@ -640,9 +644,9 @@ export default function JobWingmanPortal() {
       price: 299,
       description: '"My resume is solid and I\'m already getting some interviews. I just need more volume."',
       includes: [
-        '1 application campaign (400 applications)',
+        '400 applications',
         'Experience Bank access',
-        '1 job title'
+        '1 job direction'
       ],
       best: 'Resume ready, just need the legwork handled'
     },
@@ -654,8 +658,8 @@ export default function JobWingmanPortal() {
       includes: [
         'Resume feedback (you make the edits, we review them)',
         'Experience Bank access',
-        '1 application campaign (400 applications)',
-        '1 job title'
+        '400 applications',
+        '1 job direction'
       ],
       best: 'Stuck in a rut, happy to do the edits yourself'
     },
@@ -666,8 +670,8 @@ export default function JobWingmanPortal() {
       description: '"I just got laid off. I need to rebuild and move fast."',
       includes: [
         'Full resume rewrite, built from your Experience Bank',
-        'Experience Bank access, with support when you need it',
-        '1 application campaign (400 applications)',
+        'Experience Bank access, with questions answered by message',
+        '400 applications',
         'Up to 2 job directions'
       ],
       best: 'Recently laid off, need momentum',
@@ -680,8 +684,9 @@ export default function JobWingmanPortal() {
       description: '"I want the most hands-on help, with every part of my search handled."',
       includes: [
         'Full resume rewrite',
-        'Experience Bank with Wingman support',
-        '2 application campaigns (600 applications)',
+        'Your Experience Bank, built live on a call with a Wingman',
+        'Strategy call',
+        '600 applications',
         'Up to 4 job directions'
       ],
       best: 'The most support, including visa or work authorization deadlines'
@@ -963,7 +968,7 @@ export default function JobWingmanPortal() {
   }
 
   // Results page
-  if (currentPage === 'results') {
+  if (SHOW_RESULTS && currentPage === 'results') {
     const displayedStories = showAllStories ? caseStudies : caseStudies.slice(0, 3);
     
     return (
@@ -1077,7 +1082,7 @@ export default function JobWingmanPortal() {
                 >
                   <div className="text-3xl mb-3">📦</div>
                   <h3 className="font-bold text-teal-900 text-lg mb-1">Pick a Bundle</h3>
-                  <p className="text-teal-600 text-sm">Pre-built packages at a discount. Quick and easy.</p>
+                  <p className="text-teal-600 text-sm">Ready-made packages. Quick and easy.</p>
                   <div className="mt-4 text-coral font-bold text-sm group-hover:translate-x-1 transition-transform">
                     See bundles →
                   </div>
