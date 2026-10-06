@@ -560,7 +560,7 @@ export default function JobWingmanPortal() {
     {
       id: 'audit',
       title: 'Resume Audit',
-      price: 49,
+      price: 99,
       subtitle: 'DIY with expert guidance. We review and tell you exactly what to fix.',
       benefits: [
         'Detailed feedback report within 48 hours',
@@ -598,7 +598,7 @@ export default function JobWingmanPortal() {
     {
       id: 'rewrite-call',
       title: 'Full Rewrite + Strategy Call',
-      price: 549,
+      price: 599,
       subtitle: 'Same rebuild, but we do it together on a call. Best for people who hate writing about themselves.',
       benefits: [
         '45-minute call to talk through your experience',
@@ -649,7 +649,7 @@ export default function JobWingmanPortal() {
     {
       id: 'comeback',
       name: 'Comeback',
-      price: 379,
+      price: 399,
       description: '"I\'ve been applying for months with no results. Something isn\'t working."',
       includes: [
         'Resume feedback (you make the edits, we review them)',
@@ -662,7 +662,7 @@ export default function JobWingmanPortal() {
     {
       id: 'fresh-start',
       name: 'Fresh Start',
-      price: 649,
+      price: 699,
       description: '"I just got laid off. I need to rebuild and move fast."',
       includes: [
         'Full resume rewrite, built from your Experience Bank',
