@@ -628,15 +628,20 @@ export default function JobWingmanPortal() {
     ]
   };
 
-  // Pre-built bundles (persona-based)
+  // Pre-built bundles (persona-based). Updated 6 Oct 2026 (owner): every bundle includes
+  // the Experience Bank; nobody is interviewed for a rewrite any more; Visa-Friendly
+  // became Concierge. The "Save $X" badges were removed because the contents changed —
+  // add `savings` back once the numbers are recalculated. The ids go in the post-call
+  // email's link (?rec=) — keep them in step with jw-dashboard src/lib/postCallOptions.js.
   const bundles = [
     {
       id: 'autopilot',
       name: 'Autopilot',
-      price: 199,
+      price: 299,
       description: '"My resume is solid and I\'m already getting some interviews. I just need more volume."',
       includes: [
         '1 application campaign (400 applications)',
+        'Experience Bank access',
         '1 job title'
       ],
       best: 'Resume ready, just need the legwork handled'
@@ -647,43 +652,39 @@ export default function JobWingmanPortal() {
       price: 379,
       description: '"I\'ve been applying for months with no results. Something isn\'t working."',
       includes: [
-        'Resume tune-up (ATS check, AI cleanup, stronger bullets)',
+        'Resume feedback (you make the edits, we review them)',
+        'Experience Bank access',
         '1 application campaign (400 applications)',
         '1 job title'
       ],
-      best: 'Stuck in a rut, need a reset'
+      best: 'Stuck in a rut, happy to do the edits yourself'
     },
     {
       id: 'fresh-start',
       name: 'Fresh Start',
       price: 649,
-      savings: 98,
       description: '"I just got laid off. I need to rebuild and move fast."',
       includes: [
-        'Full resume rewrite (we interview you, rebuild from scratch)',
+        'Full resume rewrite, built from your Experience Bank',
+        'Experience Bank access, with support when you need it',
         '1 application campaign (400 applications)',
-        '1 job title'
+        'Up to 2 job directions'
       ],
       best: 'Recently laid off, need momentum',
       popular: true
     },
     {
-      id: 'visa-friendly',
-      name: 'Visa-Friendly',
+      id: 'concierge',
+      name: 'Concierge',
       price: 1299,
-      savings: 369,
-      description: '"I need sponsorship and have limited time. Every application has to count."',
+      description: '"I want the most hands-on help, with every part of my search handled."',
       includes: [
-        'Full resume rewrite (we interview you, rebuild from scratch)',
-        '2 application campaigns (800 applications)',
-        '20 tailored applications',
-        '20 cover letters',
-        'Post-apply recruiter outreach',
-        'Network Wingman',
-        'Portfolio slides',
-        '1 job title'
+        'Full resume rewrite',
+        'Experience Bank with Wingman support',
+        '2 application campaigns (600 applications)',
+        'Up to 4 job directions'
       ],
-      best: 'H1B, OPT, or work authorization with a deadline'
+      best: 'The most support, including visa or work authorization deadlines'
     }
   ];
 
@@ -1121,7 +1122,7 @@ export default function JobWingmanPortal() {
             
             <div className="text-center mb-8">
               <h1 className="text-3xl font-black text-white mb-2">Pick Your Bundle</h1>
-              <p className="text-teal-100">Pre-built packages with built-in savings</p>
+              <p className="text-teal-100">Pre-built packages for where you are in your search</p>
             </div>
             
             <div className="space-y-4 mb-8">
