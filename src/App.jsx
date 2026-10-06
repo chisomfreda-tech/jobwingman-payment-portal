@@ -134,8 +134,14 @@ const CaseStudyCard = ({ title, before, after, details, expanded, onToggle }) =>
 );
 
 // Progress steps component
-const ProgressSteps = ({ currentStep }) => {
-  const steps = ['Resume', 'Applications', 'Extras', 'Review'];
+// The "Optional extras" step is hidden for now (owner, 6 Oct 2026) while the services
+// menu is reworked. Its page (currentStep 2) is kept; set this to true to bring it back.
+const SHOW_EXTRAS = false;
+const AFTER_APPLICATIONS = SHOW_EXTRAS ? 2 : 3;
+
+const ProgressSteps = ({ currentStep: rawStep }) => {
+  const steps = SHOW_EXTRAS ? ['Resume', 'Applications', 'Extras', 'Review'] : ['Resume', 'Applications', 'Review'];
+  const currentStep = !SHOW_EXTRAS && rawStep === 3 ? 2 : rawStep;
   return (
     <div className="flex justify-between items-center mb-8 bg-cream border-3 border-teal-800 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(19,78,74,1)]">
       {steps.map((step, idx) => (
@@ -1213,7 +1219,7 @@ export default function JobWingmanPortal() {
                 disabled={!selectedBundle}
                 onClick={() => {
                   if (selectedBundle) {
-                    setCurrentStep(2); // Go to add-ons so they can add extras to their bundle
+                    setCurrentStep(SHOW_EXTRAS ? 2 : 3); // Add-ons, or straight to review while they're hidden
                   }
                 }}
                 className={`px-8 py-4 rounded-xl font-black text-lg border-3 transition-all ${
@@ -1390,7 +1396,7 @@ export default function JobWingmanPortal() {
     return (
       <PageWrapper 
         onBack={() => setCurrentStep(0)} 
-        onNext={() => setCurrentStep(2)} 
+        onNext={() => setCurrentStep(AFTER_APPLICATIONS)} 
         nextLabel="Next →"
         nextDisabled={!appMonths}
       >
@@ -1457,7 +1463,7 @@ export default function JobWingmanPortal() {
   }
 
   // Step 2: Extras
-  if (currentPage === 'pricing' && currentStep === 2) {
+  if (SHOW_EXTRAS && currentPage === 'pricing' && currentStep === 2) {
     return (
       <PageWrapper 
         onBack={() => setCurrentStep(1)} 
@@ -1815,7 +1821,7 @@ export default function JobWingmanPortal() {
                   if (flowType === 'bundle') {
                     setCurrentStep(-0.5); // Go back to bundle selection
                   } else {
-                    setCurrentStep(2); // Go back to add-ons
+                    setCurrentStep(SHOW_EXTRAS ? 2 : 1); // Back to add-ons, or applications while they're hidden
                   }
                 }}
                 className="px-6 py-3 font-bold text-teal-600 hover:text-teal-800 transition"
