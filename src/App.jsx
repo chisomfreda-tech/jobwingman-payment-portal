@@ -341,13 +341,27 @@ export default function JobWingmanPortal() {
     networkWingman: { selected: false }
   });
 
+  // The post-call email links here with ?code=<access code>, so the client lands
+  // signed in instead of typing it. The code is taken off the address bar straight
+  // away so it isn't left in the browser's history.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromLink = params.get('code');
+    if (!fromLink) return;
+    params.delete('code');
+    const rest = params.toString();
+    window.history.replaceState(null, '', window.location.pathname + (rest ? `?${rest}` : '') + window.location.hash);
+    setPassword(fromLink);
+    handleLogin(fromLink);
+  }, []);
+
   // Scroll to top when page or step changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [currentPage, currentStep, authenticated, nameCollected, orderConfirmed, showAgreement]);
 
-  const handleLogin = async () => {
-    const code = password.toLowerCase().trim();
+  const handleLogin = async (fromLink) => {
+    const code = (typeof fromLink === 'string' ? fromLink : password).toLowerCase().trim();
     setIsLoggingIn(true);
     setError('');
     
