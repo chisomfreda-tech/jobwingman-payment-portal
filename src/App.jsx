@@ -828,7 +828,7 @@ export default function JobWingmanPortal() {
       return { deposit: total, installments: 0, perInstallment: 0, lastInstallment: 0, installmentsText: '' };
     }
     const [deposit, installments] =
-      total <= 600 ? [150, 2] : total <= 1000 ? [200, 3] : [250, 4];
+      total <= 600 ? [150, 2] : total <= 1000 ? [200, 2] : [250, 3];  // never more than 3 installments
     const perInstallment = Math.floor((total - deposit) / installments);
     const lastInstallment = total - deposit - perInstallment * (installments - 1);
     const installmentsText = lastInstallment === perInstallment
