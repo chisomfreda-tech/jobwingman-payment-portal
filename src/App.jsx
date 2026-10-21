@@ -499,6 +499,7 @@ export default function JobWingmanPortal() {
               deposit: paymentPlan.deposit,
               installments: paymentPlan.installments,
               installmentAmount: paymentPlan.perInstallment,
+              lastInstallmentAmount: paymentPlan.lastInstallment,
               // The one acceptance of the legal documents; the server adds the
               // time and IP and stores the agreement text with the order.
               agreement: { version: AGREEMENT_VERSION, accepted: agreed === true, text: ACCEPTANCE_TEXT },
@@ -533,6 +534,7 @@ export default function JobWingmanPortal() {
               deposit: paymentPlan.deposit,
               installments: paymentPlan.installments,
               installmentAmount: paymentPlan.perInstallment,
+              lastInstallmentAmount: paymentPlan.lastInstallment,
             }),
           });
         } catch (emailError) {
@@ -812,17 +814,21 @@ export default function JobWingmanPortal() {
 
   const { total, items } = calculateTotal();
 
-  // Installments round down to whole dollars and the deposit takes the few
-  // dollars left over, so the plan always adds up to exactly the total
-  // (rounding each installment up made $399 come to $400).
+  // The deposit stays a round number. Installments round down to whole dollars
+  // and the last one takes the few dollars left over, so the plan always adds
+  // up to exactly the total ($399 = $150, then $124 and $125).
   const getPaymentPlan = (total) => {
     if (total <= 300) {
-      return { deposit: total, installments: 0, perInstallment: 0 };
+      return { deposit: total, installments: 0, perInstallment: 0, lastInstallment: 0, installmentsText: '' };
     }
-    const [baseDeposit, installments] =
+    const [deposit, installments] =
       total <= 600 ? [150, 2] : total <= 1000 ? [200, 3] : [250, 4];
-    const perInstallment = Math.floor((total - baseDeposit) / installments);
-    return { deposit: total - perInstallment * installments, installments, perInstallment };
+    const perInstallment = Math.floor((total - deposit) / installments);
+    const lastInstallment = total - deposit - perInstallment * (installments - 1);
+    const installmentsText = lastInstallment === perInstallment
+      ? `${installments} payments of $${perInstallment}`
+      : `${installments} payments of $${perInstallment} (the last is $${lastInstallment})`;
+    return { deposit, installments, perInstallment, lastInstallment, installmentsText };
   };
 
   const paymentPlan = getPaymentPlan(total);
@@ -1780,7 +1786,7 @@ export default function JobWingmanPortal() {
                               <div>
                                 <p className={`font-bold ${paymentChoice === 'plan' ? 'text-white' : 'text-teal-900'}`}>Payment plan</p>
                                 <p className={`text-sm ${paymentChoice === 'plan' ? 'text-teal-100' : 'text-teal-600'}`}>
-                                  ${paymentPlan.deposit} deposit, then {paymentPlan.installments} payments of ${paymentPlan.perInstallment}
+                                  ${paymentPlan.deposit} deposit, then {paymentPlan.installmentsText}
                                 </p>
                               </div>
                               <Sticker color={paymentChoice === 'plan' ? 'yellow' : 'coral'} rotate={-2}>Split it up</Sticker>
@@ -1903,7 +1909,7 @@ export default function JobWingmanPortal() {
               
               {paymentChoice === 'plan' && (
                 <p className="text-sm text-teal-600 mt-2">
-                  Payment plan: ${paymentPlan.deposit} deposit, then {paymentPlan.installments} payments of ${paymentPlan.perInstallment}
+                  Payment plan: ${paymentPlan.deposit} deposit, then {paymentPlan.installmentsText}
                 </p>
               )}
             </div>
@@ -2051,7 +2057,7 @@ export default function JobWingmanPortal() {
                 <p className="text-5xl font-black text-white">${amountDue}</p>
                 {paymentChoice === 'plan' && (
                   <p className="text-teal-100 text-sm mt-2">
-                    Then {paymentPlan.installments} payments of ${paymentPlan.perInstallment} after we start
+                    Then {paymentPlan.installmentsText} after we start
                   </p>
                 )}
               </div>

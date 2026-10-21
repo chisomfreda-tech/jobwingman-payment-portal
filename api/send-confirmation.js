@@ -17,7 +17,8 @@ export default async function handler(req, res) {
     paymentType,
     deposit,
     installments,
-    installmentAmount 
+    installmentAmount,
+    lastInstallmentAmount
   } = req.body;
 
   // Validate required fields
@@ -39,7 +40,7 @@ export default async function handler(req, res) {
     : `<p style="font-size: 18px; font-weight: bold; color: #14b8a6;">
         Deposit Due Now: $${deposit}<br>
         <span style="font-size: 14px; font-weight: normal; color: #666;">
-          Then ${installments} payments of $${installmentAmount}
+          Then ${installments} payments of $${installmentAmount}${lastInstallmentAmount && lastInstallmentAmount !== installmentAmount ? ` (the last is $${lastInstallmentAmount})` : ''}
         </span>
       </p>`;
 

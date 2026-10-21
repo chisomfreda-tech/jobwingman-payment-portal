@@ -19,7 +19,7 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Build a payment_schedule jsonb array matching the format the dashboard expects.
 // Same date logic the portal has always used: deposit due in 3 days, first installment 7 days out, then biweekly.
-function buildSchedule({ paymentType, deposit, installments, installmentAmount, total }) {
+function buildSchedule({ paymentType, deposit, installments, installmentAmount, lastInstallmentAmount, total }) {
   const schedule = [];
   const now = new Date();
 
@@ -38,7 +38,8 @@ function buildSchedule({ paymentType, deposit, installments, installmentAmount, 
       installmentDate.setDate(installmentDate.getDate() + 7 + i * 14);
       schedule.push({
         label: `Installment ${i} of ${installments}`,
-        amount: installmentAmount,
+        // The last installment can be a dollar or two more, so the plan adds up to the total.
+        amount: i === installments && lastInstallmentAmount ? lastInstallmentAmount : installmentAmount,
         due_date: onOrAfterMonday(installmentDate).toISOString().split('T')[0],
         status: 'upcoming',
       });
@@ -70,6 +71,7 @@ export default async function handler(req, res) {
     deposit,
     installments,
     installmentAmount,
+    lastInstallmentAmount,
   } = req.body || {};
 
   // Validate
@@ -89,6 +91,7 @@ export default async function handler(req, res) {
       deposit: Number(deposit) || 0,
       installments: Number(installments) || 0,
       installmentAmount: Number(installmentAmount) || 0,
+      lastInstallmentAmount: Number(lastInstallmentAmount) || 0,
       total: Number(total),
     });
 
