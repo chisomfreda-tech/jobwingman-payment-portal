@@ -814,6 +814,12 @@ export default function JobWingmanPortal() {
 
   const { total, items } = calculateTotal();
 
+  // "$124 and $125", "$166, $166 and $167"
+  const listAmounts = (amounts) => {
+    const shown = amounts.map(a => `$${a}`);
+    return shown.length > 1 ? `${shown.slice(0, -1).join(', ')} and ${shown[shown.length - 1]}` : shown[0];
+  };
+
   // The deposit stays a round number. Installments round down to whole dollars
   // and the last one takes the few dollars left over, so the plan always adds
   // up to exactly the total ($399 = $150, then $124 and $125).
@@ -827,7 +833,7 @@ export default function JobWingmanPortal() {
     const lastInstallment = total - deposit - perInstallment * (installments - 1);
     const installmentsText = lastInstallment === perInstallment
       ? `${installments} payments of $${perInstallment}`
-      : `${installments} payments of $${perInstallment} (the last is $${lastInstallment})`;
+      : `payments of ${listAmounts([...Array(installments - 1).fill(perInstallment), lastInstallment])}`;
     return { deposit, installments, perInstallment, lastInstallment, installmentsText };
   };
 

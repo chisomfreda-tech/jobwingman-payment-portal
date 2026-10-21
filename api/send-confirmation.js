@@ -35,11 +35,20 @@ export default async function handler(req, res) {
   ).join('');
 
   // Payment info
+  // "2 payments of $124", or when the last is a dollar or two more,
+  // "payments of $124 and $125" / "payments of $166, $166 and $167".
+  const installmentsText = () => {
+    const last = lastInstallmentAmount || installmentAmount;
+    if (last === installmentAmount) return `${installments} payments of $${installmentAmount}`;
+    const shown = [...Array(installments - 1).fill(installmentAmount), last].map(a => `$${a}`);
+    return `payments of ${shown.slice(0, -1).join(', ')} and ${shown[shown.length - 1]}`;
+  };
+
   // Pay later: nothing is due at checkout. The client is told in the portal
   // and by email when online payment is ready, with the exact due date.
   const laterText = paymentType === 'full'
     ? `$${total} in one payment`
-    : `$${deposit} deposit, then ${installments} payments of $${installmentAmount}${lastInstallmentAmount && lastInstallmentAmount !== installmentAmount ? ` (the last is $${lastInstallmentAmount})` : ''}`;
+    : `$${deposit} deposit, then ${installmentsText()}`;
   const paymentHtml = `<p style="font-size: 18px; font-weight: bold; color: #14b8a6;">
         Due today: $0<br>
         <span style="font-size: 14px; font-weight: normal; color: #666;">Later: ${laterText}</span>
