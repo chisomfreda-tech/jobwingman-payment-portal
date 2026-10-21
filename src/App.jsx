@@ -812,22 +812,17 @@ export default function JobWingmanPortal() {
 
   const { total, items } = calculateTotal();
 
+  // Installments round down to whole dollars and the deposit takes the few
+  // dollars left over, so the plan always adds up to exactly the total
+  // (rounding each installment up made $399 come to $400).
   const getPaymentPlan = (total) => {
     if (total <= 300) {
       return { deposit: total, installments: 0, perInstallment: 0 };
-    } else if (total <= 600) {
-      const deposit = 150;
-      const remaining = total - deposit;
-      return { deposit, installments: 2, perInstallment: Math.ceil(remaining / 2) };
-    } else if (total <= 1000) {
-      const deposit = 200;
-      const remaining = total - deposit;
-      return { deposit, installments: 3, perInstallment: Math.ceil(remaining / 3) };
-    } else {
-      const deposit = 250;
-      const remaining = total - deposit;
-      return { deposit, installments: 4, perInstallment: Math.ceil(remaining / 4) };
     }
+    const [baseDeposit, installments] =
+      total <= 600 ? [150, 2] : total <= 1000 ? [200, 3] : [250, 4];
+    const perInstallment = Math.floor((total - baseDeposit) / installments);
+    return { deposit: total - perInstallment * installments, installments, perInstallment };
   };
 
   const paymentPlan = getPaymentPlan(total);
