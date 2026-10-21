@@ -1,6 +1,6 @@
 // api/send-confirmation.js
 // Vercel serverless function to send confirmation email via Resend
-import { AGREEMENT_VERSION, AGREEMENT_SECTIONS, LEMFI_GUIDE_URL, TERMS_OF_USE_URL, PRIVACY_POLICY_URL } from '../shared/agreement.js'
+import { AGREEMENT_VERSION, AGREEMENT_SECTIONS, TERMS_OF_USE_URL, PRIVACY_POLICY_URL } from '../shared/agreement.js'
 
 export default async function handler(req, res) {
   // Only allow POST
@@ -35,19 +35,15 @@ export default async function handler(req, res) {
   ).join('');
 
   // Payment info
-  const paymentHtml = paymentType === 'full' 
-    ? `<p style="font-size: 18px; font-weight: bold; color: #14b8a6;">Total Due: $${total}</p>`
-    : `<p style="font-size: 18px; font-weight: bold; color: #14b8a6;">
-        Deposit Due Now: $${deposit}<br>
-        <span style="font-size: 14px; font-weight: normal; color: #666;">
-          Then ${installments} payments of $${installmentAmount}${lastInstallmentAmount && lastInstallmentAmount !== installmentAmount ? ` (the last is $${lastInstallmentAmount})` : ''}
-        </span>
+  // Pay later: nothing is due at checkout. The client is told in the portal
+  // and by email when online payment is ready, with the exact due date.
+  const laterText = paymentType === 'full'
+    ? `$${total} in one payment`
+    : `$${deposit} deposit, then ${installments} payments of $${installmentAmount}${lastInstallmentAmount && lastInstallmentAmount !== installmentAmount ? ` (the last is $${lastInstallmentAmount})` : ''}`;
+  const paymentHtml = `<p style="font-size: 18px; font-weight: bold; color: #14b8a6;">
+        Due today: $0<br>
+        <span style="font-size: 14px; font-weight: normal; color: #666;">Later: ${laterText}</span>
       </p>`;
-
-  // Memo instruction - use access code if available
-  const memoText = accessCode ? accessCode.toUpperCase() : 'JW Deposit';
-  // What to send now: the whole total, or the deposit on a payment plan.
-  const amountDue = paymentType === 'full' ? total : deposit;
 
   const emailHtml = `
 <!DOCTYPE html>
@@ -81,23 +77,18 @@ export default async function handler(req, res) {
     <h2 style="margin: 0 0 15px; font-size: 16px; color: #134e4a;">Payment Details</h2>
     ${paymentHtml}
     
-    <div style="background: #fef3c7; border-radius: 8px; padding: 15px; margin-top: 15px;">
-      <p style="margin: 0 0 8px; font-weight: bold; color: #92400e;">Pay with LemFi (no transfer fees):</p>
-      <p style="margin: 0 0 10px; font-size: 13px; color: #134e4a; line-height: 1.6;">Download LemFi, verify your ID, then Send money &rarr; Nigeria &rarr; Bank account. Send <strong>$${amountDue}</strong> in US dollars to:<br>
-        Bank: <strong>Zenith Bank</strong><br>Account name: <strong>Job Wingman LTD</strong><br>Account number: <strong>1312115776</strong><br>
-        Then email the confirmation screenshot to wingman@thejobwingman.com with your code below.<br>
-        First time? <a href="${LEMFI_GUIDE_URL}" style="color: #14b8a6; font-weight: bold;">Full step-by-step LemFi guide</a></p>
-      <p style="margin: 10px 0 0; font-weight: bold; color: #92400e;">Your code: <span style="font-family: monospace; background: #fff; padding: 2px 8px; border-radius: 4px;">${memoText}</span></p>
+    <div style="background: #f0fdfa; border-radius: 8px; padding: 15px; margin-top: 15px;">
+      <p style="margin: 0 0 8px; font-weight: bold; color: #134e4a;">How you'll pay</p>
+      <p style="margin: 0; font-size: 13px; color: #134e4a; line-height: 1.6;">We're setting up secure online payment. When it's ready, you'll get a notice in your client portal and an email with your exact due date. You'll then have 5 business days to pay your ${paymentType === 'full' ? 'payment' : 'deposit'}. Your intake, kickoff call, Experience Bank and resume work can all start before then. Applications start once your ${paymentType === 'full' ? 'payment' : 'deposit'} is in.</p>
     </div>
   </div>
 
   <div style="background: #fff; border: 2px solid #e5e5e5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
     <h2 style="margin: 0 0 15px; font-size: 16px; color: #134e4a;">Next Steps</h2>
     <ol style="margin: 0; padding-left: 20px; color: #666;">
-      <li style="margin-bottom: 12px;">Send your ${paymentType === 'full' ? 'payment' : 'deposit'} via LemFi</li>
       <li style="margin-bottom: 12px;"><a href="https://dashboard.thejobwingman.com/intake" style="color: #14b8a6; font-weight: bold;">Fill out the Intake Form</a> (~10 min)</li>
-      <li style="margin-bottom: 12px;">Once payment clears, we'll send you a link to schedule your <strong>Kickoff Call</strong> (15 min)</li>
-      <li style="margin-bottom: 0;">Applications start on a Monday once your resume is approved and your deposit is in, as long as both are done by Thursday 11:59 PM Eastern.</li>
+      <li style="margin-bottom: 12px;">We'll send you a link to schedule your <strong>Kickoff Call</strong> (15 min)</li>
+      <li style="margin-bottom: 0;">When payment opens, you'll get a notice in your portal and by email. Applications start on a Monday once your resume is approved and your ${paymentType === 'full' ? 'payment' : 'deposit'} is in, as long as both are done by Thursday 11:59 PM Eastern.</li>
     </ol>
   </div>
 

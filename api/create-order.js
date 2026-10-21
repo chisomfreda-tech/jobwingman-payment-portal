@@ -5,43 +5,31 @@
 import { createClient } from '@supabase/supabase-js';
 import { AGREEMENT_VERSION, AGREEMENT_SECTIONS, ACCEPTANCE_TEXT } from '../shared/agreement.js';
 
-// Installments are due on Mondays (service agreement, section 4): move a date
-// forward to the Monday on or after it.
-function onOrAfterMonday(d) {
-  const out = new Date(d);
-  const add = (8 - out.getDay()) % 7;   // Sunday 0 -> 1 day, Monday 1 -> 0 days
-  out.setDate(out.getDate() + add);
-  return out;
-}
-
 const supabaseUrl = process.env.SUPABASE_URL || 'https://dpgisnslhirfljwerrci.supabase.co';
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Build a payment_schedule jsonb array matching the format the dashboard expects.
-// Same date logic the portal has always used: deposit due in 3 days, first installment 7 days out, then biweekly.
+// Pay later: nothing is due at checkout, so no dates are set here. The dates are
+// set when online payment opens and the client is notified (deposit due 5
+// business days after that notice); until then each item is 'awaiting_notice'.
 function buildSchedule({ paymentType, deposit, installments, installmentAmount, lastInstallmentAmount, total }) {
   const schedule = [];
-  const now = new Date();
 
-  const depositDate = new Date(now);
-  depositDate.setDate(depositDate.getDate() + 3);
   schedule.push({
     label: paymentType === 'full' ? 'Payment in full' : 'Deposit',
     amount: paymentType === 'full' ? total : deposit,
-    due_date: depositDate.toISOString().split('T')[0],
-    status: 'upcoming',
+    due_date: null,
+    status: 'awaiting_notice',
   });
 
   if (paymentType !== 'full' && installments > 0) {
     for (let i = 1; i <= installments; i++) {
-      const installmentDate = new Date(now);
-      installmentDate.setDate(installmentDate.getDate() + 7 + i * 14);
       schedule.push({
         label: `Installment ${i} of ${installments}`,
         // The last installment can be a dollar or two more, so the plan adds up to the total.
         amount: i === installments && lastInstallmentAmount ? lastInstallmentAmount : installmentAmount,
-        due_date: onOrAfterMonday(installmentDate).toISOString().split('T')[0],
-        status: 'upcoming',
+        due_date: null,
+        status: 'awaiting_notice',
       });
     }
   }
@@ -139,30 +127,9 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to create order', details: orderError.message });
     }
 
-    // 2. Insert individual payment rows (same shape the dashboard consumes)
-    const paymentRows = schedule.map(item => ({
-      order_id: order.id,
-      client_id: clientId,
-      description: item.label,
-      amount: item.amount,
-      due_date: item.due_date,
-      status: 'upcoming',
-    }));
-
-    const { error: paymentsError } = await supabase
-      .from('client_payments')
-      .insert(paymentRows);
-
-    if (paymentsError) {
-      // Order was created, payments failed — return partial success so admin can rebuild schedule
-      console.error('Payment rows insert error:', paymentsError);
-      return res.status(200).json({
-        success: true,
-        orderId: order.id,
-        warning: 'Order created but payment schedule failed to save',
-        details: paymentsError.message,
-      });
-    }
+    // No client_payments rows yet: they are created with real due dates when
+    // online payment opens and the client is notified. Creating them now would
+    // need dates, and the portal and money check would show them as late.
 
     return res.status(200).json({ success: true, orderId: order.id });
   } catch (err) {

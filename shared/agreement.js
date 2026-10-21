@@ -9,11 +9,10 @@
 // agreement, the Terms of Use and the Privacy Policy). The intake form only
 // asks for the job-search permissions; it does not ask again.
 
-export const AGREEMENT_VERSION = '2026-10-02c'  // b: campaigns counted in applications, refunds and credit, pausing, late payments; c: campaign sizes, cancellation
+export const AGREEMENT_VERSION = '2026-10-21'  // b: campaigns counted in applications, refunds and credit, pausing, late payments; c: campaign sizes, cancellation; 2026-10-21: pay later, nothing due at checkout
 
 export const TERMS_OF_USE_URL = 'https://dashboard.thejobwingman.com/terms'
 export const PRIVACY_POLICY_URL = 'https://dashboard.thejobwingman.com/privacy'
-export const LEMFI_GUIDE_URL = 'https://dashboard.thejobwingman.com/pay-with-lemfi'
 
 // Owner's decisions, 2026-10-02:
 //  - A campaign is measured in applications, not days (data: 1 of 15 campaigns
@@ -26,11 +25,18 @@ export const LEMFI_GUIDE_URL = 'https://dashboard.thejobwingman.com/pay-with-lem
 //    so the agreement points at the order rather than fixing one number.
 //  - 7-day grace period on installments, then applications pause.
 //  - Pause up to 3 months; payments continue during a pause.
+// Owner's decisions, 2026-10-21:
+//  - Pay later: nothing is due at checkout. When online payment is ready the
+//    client is notified in the portal and by email with the exact due date;
+//    the deposit is due 5 business days after that notice. LemFi is no longer
+//    offered at checkout.
+//  - Intake, kickoff call, Experience Bank and resume work can start before
+//    payment; applications start once the deposit is paid.
 export const AGREEMENT_SECTIONS = [
   ['1. Services.', 'Job Wingman ("JW") agrees to provide the job search services selected above. Services include resume writing, job applications, and any add-ons selected.'],
   ['2. Application Campaigns.', 'Each application campaign is a set number of applications submitted on your behalf to positions matching your criteria; the number is shown in your order (for example, 250 or 400). A campaign is complete when its applications have been submitted. As a guide, 250 applications usually take about 6 weeks and 400 about 2 months, but we do not promise a number of days. We cannot guarantee interviews or job offers, as hiring decisions are made by employers.'],
   ['3. What You Do.', 'You agree to provide accurate information about your background, respond to our communications within 48 hours, and notify us of any interviews or offers received.'],
-  ['4. Payment.', 'A deposit is required before services begin. For payment plans, remaining installments are due on Mondays, beginning one week after applications go live. We accept payment by transfer to our bank account (Job Wingman LTD, Zenith Bank), sent through LemFi.'],
+  ['4. Payment.', 'Nothing is due when you place your order. When online payment is ready, we will notify you in your client portal and by email with your payment instructions and exact due date. Your deposit (or full payment) is due 5 business days after that notice. Intake, your kickoff call, Experience Bank and resume work can begin before you pay; applications begin once your deposit is received. For payment plans, remaining installments are due on Mondays, beginning one week after applications go live.'],
   ['5. Late Payments.', 'If an installment has not been received 7 days after its due date, applications pause until it is paid. They resume on the Monday after payment, provided payment is received by the Thursday before at 11:59 PM Eastern Time.'],
   ['6. Pausing.', 'You may pause your applications at any time, for up to 3 months in total. Scheduled payments continue while paused. If a pause goes beyond 3 months, the applications not yet submitted become credit under section 7.'],
   ['7. Cancellation, Refunds and Credit.', 'You may cancel by emailing us. Any service that has not started when you cancel is refunded, or, on a payment plan, no longer charged. Resume services cannot be refunded once work on them has begun. An application campaign that is already under way cannot be cancelled for a refund: the payments for it remain due, and the applications not yet submitted become credit (for example, 150 applications), which you can use within 12 months. For services bought as a bundle, each service is valued at its individual price, reduced by the same percentage as the bundle discount. Credit cannot be exchanged for cash.'],

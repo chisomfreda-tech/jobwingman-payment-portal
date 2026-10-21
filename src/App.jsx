@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AGREEMENT_VERSION, AGREEMENT_SECTIONS, ACCEPTANCE_TEXT, TERMS_OF_USE_URL, PRIVACY_POLICY_URL, LEMFI_GUIDE_URL } from '../shared/agreement.js'
+import { AGREEMENT_VERSION, AGREEMENT_SECTIONS, ACCEPTANCE_TEXT, TERMS_OF_USE_URL, PRIVACY_POLICY_URL } from '../shared/agreement.js'
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase client.
@@ -1809,11 +1809,11 @@ export default function JobWingmanPortal() {
                   </li>
                   <li className="flex gap-2">
                     <span className="font-bold text-teal-500">2.</span>
-                    We'll send you an invoice and onboarding form
+                    We'll email you your agreement and intake form
                   </li>
                   <li className="flex gap-2">
                     <span className="font-bold text-teal-500">3.</span>
-                    Once payment is in, we'll schedule your kickoff and confirm your Monday start date
+                    Nothing to pay today. We'll tell you in your portal and by email when payment opens
                   </li>
                 </ol>
               </div>
@@ -1847,8 +1847,8 @@ export default function JobWingmanPortal() {
               >
                 {total > 0 
                   ? paymentChoice === 'full' 
-                    ? `Continue - $${total}` 
-                    : `Continue - $${paymentPlan.deposit} deposit`
+                    ? `Continue - nothing to pay today`
+                    : `Continue - nothing to pay today`
                   : 'Select something first'}
               </button>
             </div>
@@ -2042,8 +2042,8 @@ export default function JobWingmanPortal() {
               <div className="w-20 h-20 bg-yellow-300 border-4 border-teal-900 rounded-full flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(19,78,74,1)] mx-auto mb-4">
                 <span className="text-4xl">🎉</span>
               </div>
-              <h1 className="text-3xl font-black text-white mb-2">You're almost there, {firstName}!</h1>
-              <p className="text-teal-100">One last step: send your payment to lock in your spot.</p>
+              <h1 className="text-3xl font-black text-white mb-2">You're in, {firstName}!</h1>
+              <p className="text-teal-100">Nothing to pay today. We'll let you know when payment opens.</p>
             </div>
             
             {/* Payment card */}
@@ -2051,73 +2051,30 @@ export default function JobWingmanPortal() {
               
               {/* Amount due */}
               <div className="bg-teal-500 rounded-2xl p-6 mb-6 text-center">
-                <p className="text-teal-100 text-sm uppercase tracking-wide font-bold mb-1">
-                  {paymentChoice === 'full' ? 'Total Due' : 'Deposit Due Today'}
+                <p className="text-teal-100 text-sm uppercase tracking-wide font-bold mb-1">Due today</p>
+                <p className="text-5xl font-black text-white">$0</p>
+                <p className="text-teal-100 text-sm mt-2">
+                  {paymentChoice === 'full'
+                    ? `Later: $${total} in one payment`
+                    : `Later: $${amountDue} deposit, then ${paymentPlan.installmentsText}`}
                 </p>
-                <p className="text-5xl font-black text-white">${amountDue}</p>
-                {paymentChoice === 'plan' && (
-                  <p className="text-teal-100 text-sm mt-2">
-                    Then {paymentPlan.installmentsText} after we start
-                  </p>
-                )}
               </div>
               
-              {/* LemFi instructions: the main way to pay (added Oct 2026).
-                  Money goes to Job Wingman LTD's Zenith Bank naira account; LemFi
-                  converts the client's dollars. LemFi only supports UBA and Access
-                  USD (domiciliary) accounts, so a Zenith account receives naira. */}
+              {/* Pay later: nothing is collected at checkout. When online payment
+                  is ready, the client gets a notice in their portal and by email
+                  with the instructions and exact due date (deposit due 5 business
+                  days after that notice). */}
               <div className="bg-white border-3 border-teal-500 rounded-2xl p-5 mb-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center">
-                    <span className="text-white font-black text-lg">L</span>
-                  </div>
-                  <div>
-                    <h3 className="font-black text-teal-900">Pay with LemFi</h3>
-                    <p className="text-teal-500 text-sm">No transfer fees · send from your US bank or debit card</p>
-                  </div>
-                </div>
-
-                <a href={LEMFI_GUIDE_URL} target="_blank" rel="noopener noreferrer"
-                  className="block text-center mb-4 px-4 py-3 rounded-xl bg-teal-50 border-2 border-teal-300 text-teal-800 font-bold hover:border-teal-500">
-                  First time using LemFi? Open the full step-by-step guide →
-                </a>
-                <ol className="space-y-3 text-sm text-teal-800 mb-4">
-                  <li className="flex gap-3"><span className="font-black text-teal-500">1.</span><span>Download <a href="https://lemfi.com/en-us" target="_blank" rel="noopener noreferrer" className="font-bold underline">LemFi</a> from the App Store or Google Play and create an account.</span></li>
-                  <li className="flex gap-3"><span className="font-black text-teal-500">2.</span><span>Verify your identity in the app: a US photo ID, a selfie, and your Social Security Number or ITIN. This usually takes a few minutes.</span></li>
-                  <li className="flex gap-3"><span className="font-black text-teal-500">3.</span><span>Tap <strong>Send money</strong>, choose <strong>US dollars → Nigerian naira</strong>, then <strong>Bank account</strong>. Pick <strong>Zenith Bank</strong>, enter the account number below, and check the name shows <strong>Job Wingman LTD</strong>.</span></li>
-                  <li className="flex gap-3"><span className="font-black text-teal-500">4.</span><span>In <strong>You send</strong>, enter <strong>${amountDue}</strong> in US dollars. LemFi shows what arrives in naira; that's expected.</span></li>
-                  <li className="flex gap-3"><span className="font-black text-teal-500">5.</span><span>Choose your US bank account or debit card, check the total (no transfer fee), and approve with your LemFi PIN. Screenshot the confirmation.</span></li>
-                  <li className="flex gap-3"><span className="font-black text-teal-500">6.</span><span>Email the confirmation screenshot to <a href="mailto:wingman@thejobwingman.com" className="font-bold underline">wingman@thejobwingman.com</a> with your code below, so we can match it to you.</span></li>
-                </ol>
-
-                <div className="bg-teal-50 rounded-xl p-4 mb-4 space-y-2">
-                  <p className="text-sm text-teal-600">Recipient:</p>
-                  {[
-                    ['Bank', 'Zenith Bank'],
-                    ['Account name', 'Job Wingman LTD'],
-                    ['Account number', '1312115776'],
-                  ].map(([label, value]) => (
-                    <div key={label} className="flex items-center justify-between gap-3">
-                      <span className="text-sm text-teal-600">{label}</span>
-                      <button
-                        type="button"
-                        onClick={() => navigator.clipboard?.writeText(value)}
-                        className="font-black text-teal-900 text-right hover:underline"
-                        title="Tap to copy"
-                      >
-                        {value}
-                      </button>
-                    </div>
-                  ))}
-                  <p className="text-xs text-teal-500 pt-1">Tap any detail to copy it.</p>
-                </div>
-
-                <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4">
-                  <p className="text-sm font-bold text-teal-900 mb-1">Your code (put it in your email to us)</p>
-                  <p className="font-mono bg-white px-3 py-2 rounded-lg text-teal-900 border border-yellow-400">
-                    {accessCode ? accessCode.toUpperCase() : 'JW Deposit'}
-                  </p>
-                </div>
+                <h3 className="font-black text-teal-900 mb-2">How you'll pay</h3>
+                <p className="text-sm text-teal-800 mb-3">
+                  We're setting up secure online payment. When it's ready, you'll get a notice in your
+                  client portal and an email with your exact due date. You'll then have 5 business days
+                  to pay your {paymentChoice === 'full' ? 'payment' : 'deposit'}.
+                </p>
+                <p className="text-sm text-teal-800">
+                  Your intake, kickoff call, Experience Bank and resume work can all start before then.
+                  Applications start once your {paymentChoice === 'full' ? 'payment' : 'deposit'} is in.
+                </p>
               </div>
 
               {/* Order summary */}
@@ -2144,19 +2101,15 @@ export default function JobWingmanPortal() {
               <ol className="space-y-3">
                 <li className="flex gap-3 text-teal-100">
                   <span className="w-6 h-6 bg-yellow-300 rounded-full flex items-center justify-center text-teal-900 font-bold text-sm flex-shrink-0">1</span>
-                  <span>Send your {paymentChoice === 'full' ? 'payment' : 'deposit'} using the info above</span>
-                </li>
-                <li className="flex gap-3 text-teal-100">
-                  <span className="w-6 h-6 bg-yellow-300 rounded-full flex items-center justify-center text-teal-900 font-bold text-sm flex-shrink-0">2</span>
                   <span>Fill out the <strong>Intake Form</strong> — link is in your email</span>
                 </li>
                 <li className="flex gap-3 text-teal-100">
-                  <span className="w-6 h-6 bg-yellow-300 rounded-full flex items-center justify-center text-teal-900 font-bold text-sm flex-shrink-0">3</span>
-                  <span>Once payment clears, we'll send you a link to schedule your <strong>Kickoff Call</strong> (15 min)</span>
+                  <span className="w-6 h-6 bg-yellow-300 rounded-full flex items-center justify-center text-teal-900 font-bold text-sm flex-shrink-0">2</span>
+                  <span>We'll send you a link to schedule your <strong>Kickoff Call</strong> (15 min)</span>
                 </li>
                 <li className="flex gap-3 text-teal-100">
-                  <span className="w-6 h-6 bg-yellow-300 rounded-full flex items-center justify-center text-teal-900 font-bold text-sm flex-shrink-0">4</span>
-                  <span>Applications start on a Monday once your resume is approved and your deposit is in, as long as both are done by Thursday 11:59 PM Eastern</span>
+                  <span className="w-6 h-6 bg-yellow-300 rounded-full flex items-center justify-center text-teal-900 font-bold text-sm flex-shrink-0">3</span>
+                  <span>When payment opens, you'll get a notice in your portal and by email. Applications start on a Monday once your resume is approved and your {paymentChoice === 'full' ? 'payment' : 'deposit'} is in, as long as both are done by Thursday 11:59 PM Eastern</span>
                 </li>
               </ol>
             </div>
