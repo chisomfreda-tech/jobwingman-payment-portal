@@ -2132,7 +2132,7 @@ export default function JobWingmanPortal() {
             {/* Questions */}
             <div className="text-center mt-8">
               <p className="text-teal-100 mb-2">Questions? Text or email me</p>
-              <p className="text-white font-bold">freda@thejobwingman.com</p>
+              <a href="mailto:wingman@thejobwingman.com" className="text-white font-bold underline">wingman@thejobwingman.com</a>
             </div>
             
             {/* Back button */}

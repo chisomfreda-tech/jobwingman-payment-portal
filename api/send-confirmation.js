@@ -137,9 +137,9 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Job Wingman <freda@thejobwingman.com>',
+        from: 'Job Wingman <wingman@thejobwingman.com>',
         to: clientEmail,
-        reply_to: 'thejobwingman@gmail.com',
+        reply_to: 'wingman@thejobwingman.com',
         subject: `You're all set, ${clientName}! Here's your Job Wingman agreement`,
         html: emailHtml,
       }),
@@ -160,7 +160,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Job Wingman <freda@thejobwingman.com>',
+        from: 'Job Wingman <wingman@thejobwingman.com>',
         to: 'thejobwingman@gmail.com',
         subject: `[Copy] New order from ${clientName} - $${total}`,
         html: `<p><strong>New order received!</strong></p>
